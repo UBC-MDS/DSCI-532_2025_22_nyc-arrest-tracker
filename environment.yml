@@ -1,0 +1,5 @@
+name: group22-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11.9
