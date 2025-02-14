@@ -1,5 +1,15 @@
 name: group22-env
 channels:
   - conda-forge
+  - defaults
 dependencies:
-  - python=3.11.9
+  - python=3.10
+  - ipykernel=6.12.1
+  - dash=2.10.0
+  - dash-bootstrap-components=1.0.0
+  - plotly=5.8.0
+  - tabulate=0.8.9
+  - lxml=4.8.0
+  - pip
+  - pip:
+      - dash-vega-components==0.1.0
