@@ -1,4 +1,4 @@
-# NYPD Arrest Track App Proposal
+# NYPD Arrest Tracker App Proposal
 
 **Authors**: Michael Gelfand, Hala Arar, Michael Hewlett
 
