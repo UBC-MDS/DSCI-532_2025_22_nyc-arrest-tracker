@@ -16,7 +16,7 @@ External data science consultancy
 
 The target audience wants to follow best practice in evidence-based policy. They have identified that key arrest statistics are an important outcome for several departments and initiatives. In the past each department relied on separate dashboards but to avoid reduplicated effort and reference a single set of metrics, an initiative was struck to develop a unified dashboard.
 
-They have brought on our firm to build an easily and quickly digestible dashboard on arrests in NYC. They want to will use this dashboard to track the effect of their ongoing initiatives and to develop ideas for new projects.
+They have brought on our firm to build an easily and quickly digestible dashboard on arrests in NYC. They want to use this dashboard to track the effect of their ongoing initiatives and to develop ideas for new projects.
 
 ## Description of the Data
 
@@ -26,7 +26,7 @@ We will be using New York Police Department (NYPD) arrest record data to create 
 - **Arrestee Information**: This includes age group, and sex of the arrestee.
 - **Arrest Charges**: This includes the charges for which the arrestee was arrested.
 
-We will use this data to create visualizations that will help us understand the distribution of arrests across different age groups, different charges, different locations around New York City. This will help us identify patterns and trends in the data, which could be useful for policy decisions.
+We will use this data to create visualizations that will help us understand the distribution of arrests across different age groups, charges, and locations around New York City. This will help us identify patterns and trends in the data, which could be useful for policy decisions.
 
 ## Research Questions and Usage Scenarios
 
@@ -81,4 +81,4 @@ This process allows John to make data-driven decisions, informing his strategy f
 
 *Figure 1: Preliminary Sketch of the NYPD Arrest Tracker App*
 
-The app will contain a landing page with the main component being a map of New York City in the center of the page. The map will be interactive and will allow users to click on different precincts to view the number of arrests made by the NYPD in that precinct. The map will also have a tooltip that will show the number of arrests made in a precinct when the user hovers over it. To complement this map, there will be a bar chart that will show the number of arrests made by the NYPD for each crime type. The bar chart will be interactive and will allow users to click on a bar to view the breakdown of each crime into its subcategories (i.e. assult into assault 1, 2, 3 etc.). The app will also contain 2 pie charts that will show the distribution of arrests made by the arrestees age and sex. The bar chart and the 2 pie charts will be located on the right side of the landing page. Below the map, there will be a density plot showing arrests over time, from the start of 2023 until the end of 2023. There will additionally be a collapsable menu on the left side of the page with options to filter the data by a specific day or month, and by crime type. There will also be a toggle switch to switch between displaying arrest locations or precint locations on the map.
+The app will contain a landing page with the main component being a map of New York City in the center of the page. The map will be interactive and will allow users to click on different precincts to view the number of arrests made by the NYPD in that precinct. The map will also have a tooltip that will show the number of arrests made in a precinct when the user hovers over it. To complement this map, there will be a bar chart that will show the number of arrests made by the NYPD for each crime type. The bar chart will be interactive and will allow users to click on a bar to view the breakdown of each crime into its subcategories (i.e. assult into assault 1, 2, 3 etc.). The app will also contain 2 pie charts that will show the distribution of arrests made by the arrestees age and sex. The bar chart and the 2 pie charts will be located on the right side of the landing page. Below the map, there will be a density plot showing arrests over time, from the start of 2023 until the end of 2023. There will additionally be a collapsible menu on the left side of the page with options to filter the data by a specific day or month, and by crime type. There will also be a toggle switch to switch between displaying arrest locations or precint locations on the map.
