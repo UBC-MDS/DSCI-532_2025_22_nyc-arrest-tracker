@@ -20,7 +20,7 @@ They have brought on our firm to build an easily and quickly digestible dashboar
 
 ## Description of the Data
 
-We will be using New York Police Department (NYPD) arrest record data to create visualizations, which could influence policy decisions. The dataset consists of 170,095 arrests during 2023. Each arrest record has 18 variables associated with it, which will we use to display the key information present in the data. These variables fall into the following groupings:
+We will be using New York Police Department (NYPD) arrest record data to create visualizations, which could influence policy decisions. The dataset consists of 170,095 arrests during 2023. The data was obtained from the [NYPD Arrests Dataset (2023)](https://www.kaggle.com/datasets/justinpakzad/nypd-arrests-2023-dataset) dataset on Kaggle, which was sourced from [NYC Public Data](https://data.cityofnewyork.us/d/8h9b-rp9u). Each arrest record has 18 variables associated with it, which will we use to display the key information present in the data. These variables fall into the following groupings:
 
 - **Arrest Information**: This includes the arrest date, time, and location.
 - **Arrestee Information**: This includes age group, and sex of the arrestee.
