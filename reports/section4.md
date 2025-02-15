@@ -1,6 +1,7 @@
 # App Sketch
 
 ![App Sketch](../img/Sketch.png "NYPD Arrest Tracker Sketch")
+
 *Figure 1: Preliminary Sketch of the NYPD Arrest Tracker App*
 
 The app will contain a landing page with the main component being a map of New York City in the center of the page. The map will be interactive and will allow users to click on different precincts to view the number of arrests made by the NYPD in that precinct. The map will also have a tooltip that will show the number of arrests made in a precinct when the user hovers over it. To complement this map, there will be a bar chart that will show the number of arrests made by the NYPD for each crime type. The bar chart will be interactive and will allow users to click on a bar to view the breakdown of each crime into its subcategories (i.e. assult into assault 1, 2, 3 etc.). The app will also contain 2 pie charts that will show the distribution of arrests made by the arrestees age and sex. The bar chart and the 2 pie charts will be located on the right side of the landing page. Below the map, there will be a density plot showing arrests over time, from the start of 2023 until the end of 2023. There will additionally be a collapsable menu on the left side of the page with options to filter the data by a specific day or month, and by crime type. There will also be a toggle switch to switch between displaying arrest locations or precint locations on the map.
