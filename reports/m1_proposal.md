@@ -26,7 +26,11 @@ We will be using New York Police Department (NYPD) arrest record data to create 
 - **Arrestee Information**: This includes age group, and sex of the arrestee.
 - **Arrest Charges**: This includes the charges for which the arrestee was arrested.
 
+We will add a new "Borough category" to visualize which Borough in New York City the crime was commited in. We can use the arrest coordinates provided to us to split arrests by Borough. 
+
 We will use this data to create visualizations that will help us understand the distribution of arrests across different age groups, charges, and locations around New York City. This will help us identify patterns and trends in the data, which could be useful for policy decisions.
+
+
 
 ## Research Questions and Usage Scenarios
 
