@@ -36,4 +36,4 @@ def create_map(country):
 
 # Run the app/dashboard
 if __name__ == '__main__':
-    server.run(debug=True)
+    server.run()
