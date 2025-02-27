@@ -4,6 +4,9 @@ import dash_vega_components as dvc
 from dash import Dash, dcc, callback, Input, Output
 import geopandas as gpd
 
+# This code is adapted from the 532 lecture 4 course notes. This is an initial version just
+# so we can get the deployment up and running. This code will be replaced with our actual
+# code in the future.
 
 url = 'https://naciscdn.org/naturalearth/50m/cultural/ne_50m_admin_1_states_provinces.zip'
 world_regions = gpd.read_file(url)[['wikipedia', 'name', 'region', 'admin', 'postal', 'latitude', 'longitude', 'geometry']]
