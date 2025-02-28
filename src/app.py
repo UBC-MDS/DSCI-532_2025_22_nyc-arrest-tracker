@@ -4,6 +4,7 @@ import dash_vega_components as dvc
 from dash import Dash, dcc, callback, Input, Output, html
 import geopandas as gpd
 import pandas as pd
+import plotly.express as px
 
 # Load the NYC borough GeoJSON data
 borough_url = "https://raw.githubusercontent.com/codeforgermany/click_that_hood/refs/heads/main/public/data/new-york-city-boroughs.geojson"
@@ -76,9 +77,6 @@ geo_data = pd.json_normalize(nyc_full["geojson"])
 geo_data["Borough"] = nyc_full["Borough"]
 geo_data["Arrests"] = nyc_full["Arrests"]
 
-# Initiatlize the app
-app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-server = app.server
 
 # Create map altair object
 map_chart = alt.Chart(
@@ -94,19 +92,80 @@ map_chart = alt.Chart(
     tooltip=['Borough', alt.Tooltip('Arrests', format=',')]
 ).to_dict()
 
-# Layout
+
+# Group the data by the more general offense description (OFNS_DESC)
+arrest_crimes = nyc_arrests['OFNS_DESC'].value_counts().reset_index()
+arrest_crimes.columns = ['Crime Type', 'Frequency']
+
+# Get the top 10 most frequent crimes
+top_crimes = arrest_crimes.head(10)
+
+
+colors = ['#E63946', '#1D3557', '#F1FAEE', '#457B9D', '#A8DADC', '#F1FAEE', '#1D3557', '#E63946', '#457B9D', '#A8DADC']
+
+# Create the pie chart for the top 10 crime types
+crime_pie_chart = px.pie(
+    top_crimes,
+    names='Crime Type',
+    values='Frequency',
+    title="Top 10 Crime Types by Frequency",
+    labels={'Frequency': 'Number of Arrests'},
+    color='Crime Type',  # Automatically colors based on the crime type
+    color_discrete_sequence=colors  # Custom colors
+)
+
+
+# Customize the hover template for a cleaner look and match the map style
+crime_pie_chart.update_traces(
+    hovertemplate='<b>%{label}</b><br>Arrests: %{value}<br>%{percent:.2%} of Total<extra></extra>',
+    textinfo='percent',  # Show percentage only on the pie slices
+)
+
+# Remove the legend to avoid large labels on the left
+crime_pie_chart.update_layout(showlegend=False)
+
+# Remove the arrow from the tooltip and set white background
+crime_pie_chart.update_layout(
+    hoverlabel=dict(
+        bgcolor="white",   
+        font_size=14,      
+        font_family="Arial" 
+    )
+)
+
+
+
+
+
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
+
+
+# Layout 
 app.layout = dbc.Container([
     html.H1("NYPD Arrests Map"),
     dbc.Row([
+        # Column for the map
         dbc.Col(
             [
-                dvc.Vega(spec=map_chart)
+                dvc.Vega(spec=map_chart) 
             ],
-        md=8
+            md=8
+        ),
+        # Column for the pie chart (placed top-right)
+        dbc.Col(
+            [
+                dcc.Graph(
+                    id='crime-pie-chart',
+                    figure=crime_pie_chart
+                ),
+            ],
+            md=4
         )
     ])
 ])
 
+
 # Run the app/dashboard
 if __name__ == '__main__':
-    server.run()
+    app.run_server(debug=True)
