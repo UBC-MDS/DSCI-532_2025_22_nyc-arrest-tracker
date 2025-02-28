@@ -21,22 +21,24 @@ nyc_arrests = pd.read_csv(arrest_path)
 # GeoJSON data.
 nyc_arrests = nyc_arrests[nyc_arrests["ARREST_PRECINCT"] != 483]
 
-# Get precinct centroids
-nyc_precinct['precinct_geom'] = nyc_precinct.geometry
-nyc_precinct["centroid"] = nyc_precinct["geometry"].centroid
-nyc_precinct['geometry'] = nyc_precinct['centroid']
+# Map borough names to borough codes
+borough_mapping = {
+    'B': 'Bronx',
+    'S': 'Staten Island',
+    'K': 'Brooklyn',
+    'M': 'Manhattan',
+    'Q': 'Queens'
+}
+nyc_arrests['borough'] = nyc_arrests['ARREST_BORO'].map(borough_mapping)
 
-# Perform a spatial join between the precinct and arrest data
-nyc_full = gpd.sjoin(nyc_precinct, nyc_boroughs, predicate='within')
-nyc_full['geometry'] = nyc_full['precinct_geom']
-nyc_full['precinct'] = pd.to_numeric(
-    nyc_full['precinct'],
+nyc_precinct['precinct'] = pd.to_numeric(
+    nyc_precinct['precinct'],
     downcast='integer',
     errors='coerce'
 )
 
 # Merge arrest data with GeoJSON data
-arrest_data_geo = nyc_full.merge(
+arrest_data_geo = nyc_precinct.merge(
     nyc_arrests,
     how="left",
     left_on="precinct",
@@ -44,27 +46,35 @@ arrest_data_geo = nyc_full.merge(
 )
 
 # Grouped data for initial visualization
-nyc_arrests_grouped = (nyc_arrests
-                       .groupby("ARREST_PRECINCT")
-                       .size()
-                       .reset_index(name='counts'))
+arrest_data_grouped_geo = arrest_data_geo.groupby(
+    "borough"
+).size().reset_index(name='counts')
 
 # Merge grouped data with GeoJSON data
-arrest_data_grouped_geo = nyc_full.merge(
-    nyc_arrests_grouped,
+nyc_full = arrest_data_grouped_geo.merge(
+    nyc_boroughs,
     how="left",
-    left_on="precinct",
-    right_on="ARREST_PRECINCT"
+    left_on="borough",
+    right_on="name"
 )
 
-arrest_data_grouped_geo = arrest_data_grouped_geo[
-    ["precinct", "name", "counts", "geometry"]
+# Select columns
+nyc_full = nyc_full[
+    ["borough", "counts", "geometry"]
 ]
 
 # Rename columns
-arrest_data_grouped_geo = arrest_data_grouped_geo.rename(
-    columns={"precinct": "Precinct", 'name': 'Borough', 'counts': 'Arrests'}
+nyc_full = nyc_full.rename(
+    columns={'borough': 'Borough', 'counts': 'Arrests'}
 )
+
+# Convert GeoDataFrame to DataFrame
+nyc_full["geojson"] = nyc_full["geometry"].apply(lambda x: x.__geo_interface__)
+
+# Normalize the GeoJSON data
+geo_data = pd.json_normalize(nyc_full["geojson"])
+geo_data["Borough"] = nyc_full["Borough"]
+geo_data["Arrests"] = nyc_full["Arrests"]
 
 # Initiatlize the app
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -72,7 +82,7 @@ server = app.server
 
 # Create map altair object
 map_chart = alt.Chart(
-    arrest_data_grouped_geo,
+    geo_data,
     width=600,
     height=500
 ).mark_geoshape(
@@ -81,7 +91,7 @@ map_chart = alt.Chart(
     'albersUsa'
 ).encode(
     color='Arrests',
-    tooltip=['Precinct', 'Borough', alt.Tooltip('Arrests', format=',')]
+    tooltip=['Borough', alt.Tooltip('Arrests', format=',')]
 ).to_dict()
 
 # Layout
