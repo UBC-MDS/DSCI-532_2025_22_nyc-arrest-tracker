@@ -48,6 +48,19 @@ arrest_data_grp_precinct = nyc_arrests.groupby(
     "ARREST_PRECINCT"
 ).size().reset_index(name='counts')
 
+# Gender and Age data preparation
+# Create default gender data for all arrests (citywide)
+gender_data = pd.DataFrame({
+    'PERP_SEX': nyc_arrests['PERP_SEX'].value_counts().index,
+    'Arrests': nyc_arrests['PERP_SEX'].value_counts().values
+})
+
+# Create default age data for all arrests (citywide)
+age_data = pd.DataFrame({
+    'AGE_GROUP': nyc_arrests['AGE_GROUP'].value_counts().index,
+    'Arrests': nyc_arrests['AGE_GROUP'].value_counts().values
+})
+
 # Merge arrest data with GeoJSON data
 precinct_geo = nyc_precinct.merge(
     arrest_data_grp_precinct,
@@ -83,7 +96,6 @@ geo_p_df = pd.json_normalize(precinct_geo["geojson"])
 geo_p_df["Precinct"] = precinct_geo["Precinct"]
 geo_p_df["Arrests"] = precinct_geo["Arrests"]
 
-
 # Group the data by the more general offense description (OFNS_DESC)
 arrest_crimes = nyc_arrests['OFNS_DESC'].value_counts().reset_index()
 arrest_crimes.columns = ['Crime Type', 'Frequency']
@@ -91,23 +103,48 @@ arrest_crimes.columns = ['Crime Type', 'Frequency']
 # Get the top 10 most frequent crimes
 top_crimes = arrest_crimes.head(10)
 
-
-colors = ['#E63946', '#1D3557', '#F1FAEE', '#457B9D', '#A8DADC',
+# Color schemes
+crime_colors = ['#E63946', '#1D3557', '#F1FAEE', '#457B9D', '#A8DADC',
           '#F1FAEE', '#1D3557', '#E63946', '#457B9D', '#A8DADC']
 
+gender_colors = ['#1D3557', '#E63946', '#457B9D']  # Colors for M, F, U/Other
+age_colors = ['#1D3557', '#E63946', '#457B9D', '#A8DADC', '#90A955', '#F77F00']  # Colors for different age groups
 
-# Create the pie chart for the top 10 crimes by arrests
 def create_pie_chart(data, title):
-    data = data.rename(columns={'Crime Type': 'OFNS_DESC', 'Frequency': 'Arrests'})
+    """
+    Create a pie chart with consistent styling.
+    
+    Parameters:
+    data (pd.DataFrame): DataFrame with at least two columns - one for names and one for values
+    title (str): Title for the pie chart
+    
+    Returns:
+    plotly.graph_objects.Figure: A pie chart figure
+    """
+    # Get the column names - one will be 'Arrests', the other is the category name
+    columns = list(data.columns)
+    
+    # The name column is the one that's not 'Arrests'
+    name_col = [col for col in columns if col != 'Arrests'][0]
+    
+    # Select the appropriate color scheme based on the category
+    if name_col == 'OFNS_DESC':
+        color_sequence = crime_colors
+    elif name_col == 'PERP_SEX':
+        color_sequence = gender_colors
+    elif name_col == 'AGE_GROUP':
+        color_sequence = age_colors
+    else:
+        color_sequence = crime_colors  # Default
     
     pie_chart = px.pie(
         data,
-        names='OFNS_DESC', 
+        names=name_col, 
         values='Arrests',   
         title=title,
         labels={'Arrests': 'Number of Arrests'},
-        color='OFNS_DESC',  
-        color_discrete_sequence=colors 
+        color=name_col,  
+        color_discrete_sequence=color_sequence 
     )
 
     # Customize the hover template for a cleaner look and match the map style
@@ -130,8 +167,11 @@ def create_pie_chart(data, title):
     return pie_chart
 
 
-# Create the initial pie chart for all of NYC
-crime_pie_chart = create_pie_chart(top_crimes, "Top 10 Crime Types")
+# Create the initial pie charts
+crime_pie_data = top_crimes.rename(columns={'Crime Type': 'OFNS_DESC', 'Frequency': 'Arrests'})
+crime_pie_chart = create_pie_chart(crime_pie_data, "Top 10 Crime Types")
+gender_pie_chart = create_pie_chart(gender_data, "Arrests by Gender")
+age_pie_chart = create_pie_chart(age_data, "Arrests by Age Group")
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
@@ -152,15 +192,23 @@ app.layout = dbc.Container([
             ],
             md=8
         ),
-        # Column for the pie chart (placed top-right)
+        # Column for the pie charts (placed right)
         dbc.Col(
             [
                 dcc.Graph(
                     id='crime-pie-chart',
                     figure=crime_pie_chart
                 ),
+                dcc.Graph(
+                    id='gender-pie-chart',
+                    figure=gender_pie_chart
+                ),
+                dcc.Graph(
+                    id='age-pie-chart',
+                    figure=age_pie_chart
+                ),
                 # Reset button
-                dbc.Button("Reset Pie Chart", id="reset-button", color="primary", className="mr-1", n_clicks=0)
+                dbc.Button("Reset All Charts", id="reset-button", color="primary", className="mr-1 mb-3", n_clicks=0)
             ],
             md=4
         )
@@ -206,69 +254,130 @@ def create_map_chart(toggle_value):
 
     return map_chart
 
-# Callback 
+# Helper function to get the selected location from clicked_region
+def get_selected_location(clicked_region):
+    """
+    Extract the selected location (borough or precinct) from the clicked region data.
+    
+    Parameters:
+    clicked_region (dict): The signal data from the map click
+    
+    Returns:
+    tuple: (selected_location, location_label) or (None, None) if no valid selection
+    """
+    if not clicked_region or 'select_region' not in clicked_region:
+        return None, None
+        
+    # Check if the clicked region is a borough or precinct
+    selected_location = clicked_region['select_region'].get('Borough', None)
+    
+    if not selected_location:
+        selected_location = clicked_region['select_region'].get('Precinct', None)
+    
+    # If selected_location is a list, get the first element
+    if isinstance(selected_location, list) and selected_location:
+        selected_location = selected_location[0]
+    
+    # Format the location label (add "Precinct" prefix for precinct numbers)
+    location_label = selected_location
+    if isinstance(selected_location, int):
+        location_label = f"Precinct {selected_location}"
+        
+    return selected_location, location_label
+
+# Helper function to filter data by location
+def filter_data_by_location(selected_location):
+    """
+    Filter the arrest data by the selected borough or precinct.
+    
+    Parameters:
+    selected_location: The selected borough name or precinct number
+    
+    Returns:
+    pd.DataFrame: Filtered arrest data or None if no valid data
+    """
+    if selected_location is None:
+        return None
+        
+    if selected_location in borough_mapping.values():
+        # Filter data for the selected borough
+        filtered_data = nyc_arrests[nyc_arrests['borough'] == selected_location]
+    else:
+        # Filter data for the selected precinct
+        filtered_data = nyc_arrests[nyc_arrests['ARREST_PRECINCT'] == selected_location]
+    
+    if filtered_data.empty:
+        return None
+        
+    return filtered_data
+
+# Consolidated callback for all pie charts
 @callback(
-    Output('crime-pie-chart', 'figure'),
-    Input('map', 'signalData'),
-    Input('reset-button', 'n_clicks')
+    [Output('crime-pie-chart', 'figure'),
+     Output('gender-pie-chart', 'figure'),
+     Output('age-pie-chart', 'figure')],
+    [Input('map', 'signalData'),
+     Input('reset-button', 'n_clicks')]
 )
-def update_pie_chart(clicked_region, n_clicks):
-    # Reset button was clicked
+def update_all_pie_charts(clicked_region, n_clicks):
+    # Initialize with default charts
+    crime_chart = create_pie_chart(
+        top_crimes.rename(columns={'Crime Type': 'OFNS_DESC', 'Frequency': 'Arrests'}), 
+        "Top 10 Crime Types"
+    )
+    gender_chart = create_pie_chart(gender_data, "Arrests by Gender")
+    age_chart = create_pie_chart(age_data, "Arrests by Age Group")
+    
+    # Reset button was clicked - return all default charts
     if callback_context.triggered and callback_context.triggered[0]['prop_id'].startswith('reset-button'):
-        return create_pie_chart(top_crimes, "Top 10 Crime Types")
-
-    # Ensure clicked_region is valid
-    if clicked_region and 'select_region' in clicked_region:
-        # Check if the clicked region is a borough or precinct
-        selected_location = clicked_region['select_region'].get(
-            'Borough', None
-        )
-
-        if not selected_location:
-            selected_location = clicked_region['select_region'].get(
-                'Precinct', None
-            )
-
-        # If selected_location is a list, get the first element
-        if isinstance(selected_location, list) and selected_location:
-            selected_location = selected_location[0]
-
-        # location should only ever been a string or an int
-        if isinstance(selected_location, str) or isinstance(selected_location, int):
-            if selected_location in borough_mapping.values():
-                # Filter data for the selected borough
-                filtered_data = nyc_arrests[
-                    nyc_arrests['borough'] == selected_location
-                ]
-            else:
-                # Filter data for the selected precinct
-                filtered_data = nyc_arrests[nyc_arrests['ARREST_PRECINCT'] == selected_location]
-
-            # Ensure that filtered data is being returned, otherwise do nothing
-            if not filtered_data.empty:
-                # Get the top 10 most frequent crimes based on arrests
-                arrest_crimes_filtered = (
-                    filtered_data.groupby('OFNS_DESC')
-                    .size()
-                    .reset_index(name='Arrests')
-                    .sort_values(by='Arrests', ascending=False)
-                    .head(10)
-                )
-
-                # Rename for consistency
-                arrest_crimes_filtered = arrest_crimes_filtered.rename(columns={'OFNS_DESC': 'Crime Type', 'Arrests': 'Frequency'})
-
-                # If the selected location is an integer, add "Precinct" to the label
-                if isinstance(selected_location, int):
-                    selected_location = f"Precinct {selected_location}"
-
-                # Create a new pie chart for the filtered borough or precinct
-                crime_pie_chart_filtered = create_pie_chart(arrest_crimes_filtered, f"Top 10 Crime Types in {selected_location}")
-                return crime_pie_chart_filtered
-
-    # If no region is selected, return the default pie chart
-    return create_pie_chart(top_crimes, "Top 10 Crime Types")
-
+        return crime_chart, gender_chart, age_chart
+    
+    # Get selected location from map click
+    selected_location, location_label = get_selected_location(clicked_region)
+    if selected_location is None:
+        return crime_chart, gender_chart, age_chart
+    
+    # Filter data by selected location
+    filtered_data = filter_data_by_location(selected_location)
+    if filtered_data is None:
+        return crime_chart, gender_chart, age_chart
+    
+    # Create updated crime chart
+    crime_counts = (
+        filtered_data.groupby('OFNS_DESC')
+        .size()
+        .reset_index(name='Arrests')
+        .sort_values(by='Arrests', ascending=False)
+        .head(10)
+    )
+    updated_crime_chart = create_pie_chart(
+        crime_counts, 
+        f"Top 10 Crime Types in {location_label}"
+    )
+    
+    # Create updated gender chart
+    gender_counts = filtered_data['PERP_SEX'].value_counts()
+    gender_counts_filtered = pd.DataFrame({
+        'PERP_SEX': gender_counts.index,
+        'Arrests': gender_counts.values
+    })
+    updated_gender_chart = create_pie_chart(
+        gender_counts_filtered, 
+        f"Arrests by Gender in {location_label}"
+    )
+    
+    # Create updated age chart
+    age_counts = filtered_data['AGE_GROUP'].value_counts()
+    age_counts_filtered = pd.DataFrame({
+        'AGE_GROUP': age_counts.index,
+        'Arrests': age_counts.values
+    })
+    updated_age_chart = create_pie_chart(
+        age_counts_filtered, 
+        f"Arrests by Age Group in {location_label}"
+    )
+    
+    return updated_crime_chart, updated_gender_chart, updated_age_chart
 
 # Run the app/dashboard
 if __name__ == '__main__':
