@@ -210,8 +210,12 @@ sidebar = dbc.Collapse(
                 display_format='MM-DD',  # Format for the displayed date
                 className="mb-3",
                 min_date_allowed=min_date,  # Restrict selection to the min_date
-                max_date_allowed=max_date  # Restrict selection to the max_date
-                
+                max_date_allowed=max_date,  # Restrict selection to the max_date
+                style={
+                    "transform": "scale(0.75)", 
+                    "transform-origin": "top left",
+                    "white-space": "nowrap"
+                }
             ),
 
             
