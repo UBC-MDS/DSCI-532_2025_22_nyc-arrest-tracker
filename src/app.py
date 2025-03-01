@@ -113,12 +113,13 @@ crime_colors = ['#E63946', '#1D3557', '#F1FAEE', '#457B9D', '#A8DADC',
 gender_colors = ['#1D3557', '#E63946', '#457B9D']  # Colors for M, F, U/Other
 age_colors = ['#1D3557', '#E63946', '#457B9D', '#A8DADC', '#90A955', '#F77F00']  # Colors for different age groups
 
-def create_pie_chart(data):
+def create_pie_chart(data, title):
     """
     Create a pie chart with consistent styling.
     
     Parameters:
     data (pd.DataFrame): DataFrame with at least two columns - one for names and one for values
+    title (str): Title for the pie chart
     
     Returns:
     plotly.graph_objects.Figure: A pie chart figure
@@ -143,6 +144,7 @@ def create_pie_chart(data):
         data,
         names=name_col, 
         values='Arrests',   
+        title=title,
         labels={'Arrests': 'Number of Arrests'},
         color=name_col,  
         color_discrete_sequence=color_sequence 
@@ -168,18 +170,17 @@ def create_pie_chart(data):
     return pie_chart
 
 
-# Calculate min and max dates from the data
-min_date = nyc_arrests['ARREST_DATE'].min()  
-max_date = nyc_arrests['ARREST_DATE'].max() 
-
 # Create the initial pie charts
 crime_pie_data = top_crimes.rename(columns={'Crime Type': 'OFNS_DESC', 'Frequency': 'Arrests'})
-crime_pie_chart = create_pie_chart(crime_pie_data)
-gender_pie_chart = create_pie_chart(gender_data)
-age_pie_chart = create_pie_chart(age_data)
+crime_pie_chart = create_pie_chart(crime_pie_data, "Top 10 Crime Types")
+gender_pie_chart = create_pie_chart(gender_data, "Arrests by Gender")
+age_pie_chart = create_pie_chart(age_data, "Arrests by Age Group")
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
+
+
+
 
 # Sidebar for displaying filters and customization options
 sidebar = dbc.Collapse(
@@ -244,6 +245,9 @@ sidebar = dbc.Collapse(
     is_open=False,  # Start collapsed
 )
 
+
+
+
 # Sidebar toggle button
 collapse_button = dbc.Button(
     "☰ Additional Filters",
@@ -275,44 +279,22 @@ app.layout = dbc.Container([
         # Column for the pie charts (placed right)
         dbc.Col(
             [
-                # Wrapper for all pie charts
-                html.Div([
-                    # First Pie Chart: Crime Types
-                    html.Div([
-                        html.H5("Top 10 Crime Types", className="text-center", style={"margin-bottom": "0px", "padding-bottom": "5px"}),  # Title close to chart
-                        dcc.Graph(
-                            id='crime-pie-chart',
-                            figure=crime_pie_chart,
-                            style={'height': '250px', 'margin-bottom': '10px'}  # Reduce space below chart
-                        ),
-                    ], style={'margin-bottom': '10px'}),  # Margin between charts
-
-                    # Second Pie Chart: Gender Distribution
-                    html.Div([
-                        html.H5("Arrests by Gender", className="text-center", style={"margin-bottom": "0px", "padding-bottom": "5px"}),  # Title close to chart
-                        dcc.Graph(
-                            id='gender-pie-chart',
-                            figure=gender_pie_chart,
-                            style={'height': '250px', 'margin-bottom': '10px'}  # Reduce space below chart
-                        ),
-                    ], style={'margin-bottom': '10px'}),  # Margin between charts
-
-                    # Third Pie Chart: Age Distribution
-                    html.Div([
-                        html.H5("Arrests by Age Group", className="text-center", style={"margin-bottom": "0px", "padding-bottom": "5px"}),  # Title close to chart
-                        dcc.Graph(
-                            id='age-pie-chart',
-                            figure=age_pie_chart,
-                            style={'height': '250px'}  # Reduce space below chart
-                        ),
-                    ])
-                ], style={'textAlign': 'center', 'padding': '0 10px'}),  # Center the charts and control padding
-
+                dcc.Graph(
+                    id='crime-pie-chart',
+                    figure=crime_pie_chart
+                ),
+                dcc.Graph(
+                    id='gender-pie-chart',
+                    figure=gender_pie_chart
+                ),
+                dcc.Graph(
+                    id='age-pie-chart',
+                    figure=age_pie_chart
+                )
             ],
-            md=4,
-            style={'height': 'auto', 'overflow': 'auto'}  # Auto-height for the column
+            md=4
         )
-    ], justify="center", align="start")
+    ])
 ], fluid=True)
 
 
