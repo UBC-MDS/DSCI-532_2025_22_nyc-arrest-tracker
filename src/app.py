@@ -104,8 +104,7 @@ arrest_crimes.columns = ['Crime Type', 'Frequency']
 top_crimes = arrest_crimes.head(10)
 
 # Get all unique crime types for dropdown
-all_crime_types = nyc_arrests['OFNS_DESC'].unique().tolist()
-all_crime_types.insert(0, "All Crimes")  # Add "All Crimes" option at the beginning
+all_crime_types = sorted(nyc_arrests['OFNS_DESC'].unique().tolist())
 
 # Color schemes
 crime_colors = ['#E63946', '#1D3557', '#F1FAEE', '#457B9D', '#A8DADC',
@@ -190,9 +189,9 @@ sidebar = dbc.Collapse(
             dcc.Dropdown(
                 id="crime-type-dropdown",
                 options=[{"label": crime, "value": crime} for crime in all_crime_types],
-                value=["All Crimes"],
+                value=[],
                 multi=True,
-                clearable=False,
+                placeholder="Select crime types (empty for all)",
                 className="mb-3"
             )
         ],
@@ -275,7 +274,7 @@ def filter_data_by_crime_type(data, crime_types):
     Returns:
     pd.DataFrame: Filtered data
     """
-    if not crime_types or "All Crimes" in crime_types:
+    if not crime_types:  # Empty list means all crimes
         return data
     
     return data[data['OFNS_DESC'].isin(crime_types)]
@@ -290,7 +289,7 @@ def filter_data_by_crime_type(data, crime_types):
 def create_map_chart(toggle_value, crime_types):
     # Filter arrests data based on crime types
     filtered_arrests = nyc_arrests
-    if "All Crimes" not in crime_types and crime_types:
+    if crime_types:  # If crime types are selected
         filtered_arrests = filter_data_by_crime_type(nyc_arrests, crime_types)
     
     # Recalculate aggregated data
@@ -442,7 +441,7 @@ def update_all_pie_charts(clicked_region, crime_types, n_clicks):
     filtered_by_crime = nyc_arrests
     
     # Format crime types for display
-    if "All Crimes" in crime_types or not crime_types:
+    if not crime_types:
         crime_type_display = ""
     elif len(crime_types) == 1:
         crime_type_display = f" - {crime_types[0]}"
@@ -450,7 +449,7 @@ def update_all_pie_charts(clicked_region, crime_types, n_clicks):
         crime_type_display = f" - Selected Crimes ({len(crime_types)})"
     
     # Apply crime type filter
-    if "All Crimes" not in crime_types and crime_types:
+    if crime_types:
         filtered_by_crime = filter_data_by_crime_type(nyc_arrests, crime_types)
     
     # Get selected location from map click
@@ -475,7 +474,7 @@ def update_all_pie_charts(clicked_region, crime_types, n_clicks):
         location_label_display = ""
     
     # Create crime chart
-    if "All Crimes" not in crime_types and len(crime_types) <= 3:
+    if crime_types and len(crime_types) <= 3:
         # When specific crimes are selected and not too many, show distribution among those crimes
         crime_counts = filtered_data.groupby('OFNS_DESC').size().reset_index(name='Arrests')
         crime_counts = crime_counts[crime_counts['OFNS_DESC'].isin(crime_types)]
