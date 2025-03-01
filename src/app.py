@@ -1,7 +1,7 @@
 import altair as alt
 import dash_bootstrap_components as dbc
 import dash_vega_components as dvc
-from dash import Dash, dcc, callback, Input, Output, html, callback_context
+from dash import Dash, dcc, callback, Input, Output, html, callback_context, State
 import geopandas as gpd
 import pandas as pd
 import plotly.express as px
@@ -176,14 +176,46 @@ age_pie_chart = create_pie_chart(age_data, "Arrests by Age Group")
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
+# Sidebar for displaying filters and customization options
+sidebar = dbc.Collapse(
+    html.Div(
+        [
+            dbc.Switch(id="map-toggle", label="Toggle Precincts/Boroughs", value=False)
+        ],
+        style={
+            "position": "fixed",
+            "top": 0,
+            "left": 0,  # Always aligned to the left
+            "width": "300px",
+            "height": "100vh",
+            "background-color": "#e6e6e6",
+            "padding": "20px",
+            "z-index": "1000",  # Keep sidebar above content
+        }
+    ),
+    id="sidebar",
+    is_open=False,  # Start collapsed
+)
+
+# Sidebar toggle button
+collapse_button = dbc.Button(
+    "☰ Customization",
+    id="collapse-button",
+    style={
+        'width': '150px',
+        'background-color': 'white',
+        'color': 'steelblue',
+        'margin-top': 10,
+    }
+)
+
 # Layout
 app.layout = dbc.Container([
-    html.H1("NYPD Arrests Map"),
-    dbc.Switch(
-        id='map-toggle',
-        label='Toggle Precincts/Boroughs',
-        value=False
-    ),
+    dbc.Row([
+        dbc.Col(html.H1("NYPD Arrests Map"), width="auto"),  # Title
+        dbc.Col(collapse_button, width="auto"),  # Collapse Button beside it
+    ], align="center", className="mb-3"),  # Align items and add margin
+    sidebar,
     dbc.Row([
         # Column for the map
         dbc.Col(
@@ -213,7 +245,7 @@ app.layout = dbc.Container([
             md=4
         )
     ])
-])
+], fluid=True)
 
 
 # Create map chart function
@@ -378,6 +410,15 @@ def update_all_pie_charts(clicked_region, n_clicks):
     )
     
     return updated_crime_chart, updated_gender_chart, updated_age_chart
+
+@app.callback(
+    Output("sidebar", "is_open"),
+    Input("collapse-button", "n_clicks"),
+    State("sidebar", "is_open"),
+)
+def toggle_sidebar(n, is_open):
+    # Toggle sidebar visiblity
+    return not is_open if n else is_open
 
 # Run the app/dashboard
 if __name__ == '__main__':
