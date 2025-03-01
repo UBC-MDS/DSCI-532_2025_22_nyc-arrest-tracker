@@ -180,6 +180,9 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
 
+# Calculate min and max dates from the data
+min_date = nyc_arrests['ARREST_DATE'].min()  
+max_date = nyc_arrests['ARREST_DATE'].max() 
 
 
 # Sidebar for displaying filters and customization options
