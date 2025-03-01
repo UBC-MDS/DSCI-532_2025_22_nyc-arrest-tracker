@@ -193,6 +193,20 @@ sidebar = dbc.Collapse(
                 multi=True,
                 placeholder="Select crime types (empty for all)",
                 className="mb-3"
+            ),
+            dbc.Button(
+                "Reset All Charts",
+                id="reset-button",
+                color="primary",
+                className="mr-1 mb-3",
+                n_clicks=0,
+                style={
+                    "position": "absolute",  # Keeps the button fixed in place
+                    "bottom": "20px",        # Position it at the bottom of the sidebar
+                    "width": "80%",          # Give it a fixed width (or adjust as needed)
+                    "left": "50%",           # Center the button horizontally
+                    "transform": "translateX(-50%)"  # This makes sure it's perfectly centered
+                }
             )
         ],
         style={
@@ -252,9 +266,7 @@ app.layout = dbc.Container([
                 dcc.Graph(
                     id='age-pie-chart',
                     figure=age_pie_chart
-                ),
-                # Reset button
-                dbc.Button("Reset All Charts", id="reset-button", color="primary", className="mr-1 mb-3", n_clicks=0)
+                )
             ],
             md=4
         )
