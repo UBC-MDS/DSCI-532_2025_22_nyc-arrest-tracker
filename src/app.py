@@ -190,7 +190,8 @@ sidebar = dbc.Collapse(
             dcc.Dropdown(
                 id="crime-type-dropdown",
                 options=[{"label": crime, "value": crime} for crime in all_crime_types],
-                value="All Crimes",
+                value=["All Crimes"],
+                multi=True,
                 clearable=False,
                 className="mb-3"
             )
@@ -262,22 +263,22 @@ app.layout = dbc.Container([
 ], fluid=True)
 
 
-# Helper function to filter data by crime type
-def filter_data_by_crime_type(data, crime_type):
+# Helper function to filter data by crime types
+def filter_data_by_crime_type(data, crime_types):
     """
-    Filter data by selected crime type
+    Filter data by selected crime types
     
     Parameters:
     data (pd.DataFrame): DataFrame to filter
-    crime_type (str): Crime type to filter by
+    crime_types (list): Crime types to filter by
     
     Returns:
     pd.DataFrame: Filtered data
     """
-    if crime_type == "All Crimes" or crime_type is None:
+    if not crime_types or "All Crimes" in crime_types:
         return data
     
-    return data[data['OFNS_DESC'] == crime_type]
+    return data[data['OFNS_DESC'].isin(crime_types)]
 
 
 # Create map chart function
@@ -286,11 +287,11 @@ def filter_data_by_crime_type(data, crime_type):
     [Input('map-toggle', 'value'),
      Input('crime-type-dropdown', 'value')]
 )
-def create_map_chart(toggle_value, crime_type):
-    # Filter arrests data based on crime type
+def create_map_chart(toggle_value, crime_types):
+    # Filter arrests data based on crime types
     filtered_arrests = nyc_arrests
-    if crime_type != "All Crimes":
-        filtered_arrests = filter_data_by_crime_type(nyc_arrests, crime_type)
+    if "All Crimes" not in crime_types and crime_types:
+        filtered_arrests = filter_data_by_crime_type(nyc_arrests, crime_types)
     
     # Recalculate aggregated data
     arrest_data_grp_borough_filtered = filtered_arrests.groupby(
@@ -433,74 +434,54 @@ def filter_data_by_location(selected_location, data):
      Input('crime-type-dropdown', 'value'),
      Input('reset-button', 'n_clicks')]
 )
-def update_all_pie_charts(clicked_region, crime_type, n_clicks):
-    # First filter the data by crime type
+def update_all_pie_charts(clicked_region, crime_types, n_clicks):
+    ctx = callback_context
+    triggered_id = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
+    
+    # First filter the data by crime types
     filtered_by_crime = nyc_arrests
-    crime_type_display = ""
     
-    if crime_type != "All Crimes":
-        filtered_by_crime = filter_data_by_crime_type(nyc_arrests, crime_type)
-        crime_type_display = f" - {crime_type}"
-    
-    # Create default charts filtered by crime type
-    if crime_type != "All Crimes":
-        crime_counts = pd.DataFrame({
-            'OFNS_DESC': [crime_type],
-            'Arrests': [len(filtered_by_crime)]
-        })
-        default_crime_chart = create_pie_chart(crime_counts, f"Arrests for {crime_type}")
+    # Format crime types for display
+    if "All Crimes" in crime_types or not crime_types:
+        crime_type_display = ""
+    elif len(crime_types) == 1:
+        crime_type_display = f" - {crime_types[0]}"
     else:
-        crime_counts = (filtered_by_crime['OFNS_DESC'].value_counts()
-                        .reset_index()
-                        .rename(columns={'index': 'OFNS_DESC', 'OFNS_DESC': 'Arrests'})
-                        .head(10))
-        default_crime_chart = create_pie_chart(crime_counts, f"Top 10 Crime Types{crime_type_display}")
+        crime_type_display = f" - Selected Crimes ({len(crime_types)})"
     
-    # Gender data filtered by crime type
-    gender_counts = filtered_by_crime['PERP_SEX'].value_counts()
-    gender_counts_filtered = pd.DataFrame({
-        'PERP_SEX': gender_counts.index,
-        'Arrests': gender_counts.values
-    })
-    default_gender_chart = create_pie_chart(gender_counts_filtered, f"Arrests by Gender{crime_type_display}")
-    
-    # Age data filtered by crime type
-    age_counts = filtered_by_crime['AGE_GROUP'].value_counts()
-    age_counts_filtered = pd.DataFrame({
-        'AGE_GROUP': age_counts.index,
-        'Arrests': age_counts.values
-    })
-    default_age_chart = create_pie_chart(age_counts_filtered, f"Arrests by Age Group{crime_type_display}")
-    
-    # Reset button was clicked - return charts filtered only by crime type
-    if callback_context.triggered and callback_context.triggered[0]['prop_id'].startswith('reset-button'):
-        return default_crime_chart, default_gender_chart, default_age_chart
-    
-    # Check if the dropdown was triggered
-    if callback_context.triggered and callback_context.triggered[0]['prop_id'].startswith('crime-type-dropdown'):
-        return default_crime_chart, default_gender_chart, default_age_chart
+    # Apply crime type filter
+    if "All Crimes" not in crime_types and crime_types:
+        filtered_by_crime = filter_data_by_crime_type(nyc_arrests, crime_types)
     
     # Get selected location from map click
     selected_location, location_label = get_selected_location(clicked_region)
-    if selected_location is None:
-        return default_crime_chart, default_gender_chart, default_age_chart
     
-    # Filter data by selected location and crime type
-    filtered_data = filter_data_by_location(selected_location, filtered_by_crime)
-    if filtered_data is None:
-        return default_crime_chart, default_gender_chart, default_age_chart
-    
-    # Create updated crime chart
-    if crime_type != "All Crimes":
-        crime_counts = pd.DataFrame({
-            'OFNS_DESC': [crime_type],
-            'Arrests': [len(filtered_data)]
-        })
-        updated_crime_chart = create_pie_chart(
-            crime_counts, 
-            f"Arrests for {crime_type} in {location_label}"
-        )
+    # Apply location filter if a location is selected
+    if selected_location is not None:
+        filtered_data = filter_data_by_location(selected_location, filtered_by_crime)
+        if filtered_data is None or filtered_data.empty:
+            # If no data for selected location, just use crime-filtered data
+            filtered_data = filtered_by_crime
+            location_label_display = ""
+        else:
+            location_label_display = f" in {location_label}"
     else:
+        filtered_data = filtered_by_crime
+        location_label_display = ""
+    
+    # Reset button was clicked - reset location but keep crime type filter
+    if triggered_id == "reset-button":
+        filtered_data = filtered_by_crime
+        location_label_display = ""
+    
+    # Create crime chart
+    if "All Crimes" not in crime_types and len(crime_types) <= 3:
+        # When specific crimes are selected and not too many, show distribution among those crimes
+        crime_counts = filtered_data.groupby('OFNS_DESC').size().reset_index(name='Arrests')
+        crime_counts = crime_counts[crime_counts['OFNS_DESC'].isin(crime_types)]
+        crime_title = f"Selected Crime Types{location_label_display}"
+    else:
+        # Otherwise show top 10
         crime_counts = (
             filtered_data.groupby('OFNS_DESC')
             .size()
@@ -508,12 +489,11 @@ def update_all_pie_charts(clicked_region, crime_type, n_clicks):
             .sort_values(by='Arrests', ascending=False)
             .head(10)
         )
-        updated_crime_chart = create_pie_chart(
-            crime_counts, 
-            f"Top 10 Crime Types in {location_label}{crime_type_display}"
-        )
+        crime_title = f"Top 10 Crime Types{location_label_display}{crime_type_display}"
     
-    # Create updated gender chart
+    updated_crime_chart = create_pie_chart(crime_counts, crime_title)
+    
+    # Create gender chart
     gender_counts = filtered_data['PERP_SEX'].value_counts()
     gender_counts_filtered = pd.DataFrame({
         'PERP_SEX': gender_counts.index,
@@ -521,10 +501,10 @@ def update_all_pie_charts(clicked_region, crime_type, n_clicks):
     })
     updated_gender_chart = create_pie_chart(
         gender_counts_filtered, 
-        f"Arrests by Gender in {location_label}{crime_type_display}"
+        f"Arrests by Gender{location_label_display}{crime_type_display}"
     )
     
-    # Create updated age chart
+    # Create age chart
     age_counts = filtered_data['AGE_GROUP'].value_counts()
     age_counts_filtered = pd.DataFrame({
         'AGE_GROUP': age_counts.index,
@@ -532,7 +512,7 @@ def update_all_pie_charts(clicked_region, crime_type, n_clicks):
     })
     updated_age_chart = create_pie_chart(
         age_counts_filtered, 
-        f"Arrests by Age Group in {location_label}{crime_type_display}"
+        f"Arrests by Age Group{location_label_display}{crime_type_display}"
     )
     
     return updated_crime_chart, updated_gender_chart, updated_age_chart
