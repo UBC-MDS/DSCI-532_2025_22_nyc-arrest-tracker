@@ -38,59 +38,50 @@ nyc_precinct['precinct'] = pd.to_numeric(
     errors='coerce'
 )
 
-# Merge arrest data with GeoJSON data
-arrest_data_geo = nyc_precinct.merge(
-    nyc_arrests,
-    how="left",
-    left_on="precinct",
-    right_on="ARREST_PRECINCT"
-)
-
 # Grouped data for initial visualization
-arrest_data_grouped_geo = arrest_data_geo.groupby(
+arrest_data_grp_borough = nyc_arrests.groupby(
     "borough"
 ).size().reset_index(name='counts')
 
-# Merge grouped data with GeoJSON data
-nyc_full = arrest_data_grouped_geo.merge(
+# Group by precinct
+arrest_data_grp_precinct = nyc_arrests.groupby(
+    "ARREST_PRECINCT"
+).size().reset_index(name='counts')
+
+# Merge arrest data with GeoJSON data
+precinct_geo = nyc_precinct.merge(
+    arrest_data_grp_precinct,
+    how="left",
+    left_on="precinct",
+    right_on="ARREST_PRECINCT"
+).rename(
+    columns={"precinct": "Precinct", "counts": "Arrests"}
+)[["Precinct", "Arrests", "geometry"]]
+
+borough_geo = arrest_data_grp_borough.merge(
     nyc_boroughs,
     how="left",
     left_on="borough",
     right_on="name"
-)
-
-# Select columns
-nyc_full = nyc_full[
-    ["borough", "counts", "geometry"]
-]
-
-# Rename columns
-nyc_full = nyc_full.rename(
-    columns={'borough': 'Borough', 'counts': 'Arrests'}
-)
+).rename(
+    columns={"borough": "Borough", "counts": "Arrests"}
+)[["Borough", "Arrests", "geometry"]]
 
 # Convert GeoDataFrame to DataFrame
-nyc_full["geojson"] = nyc_full["geometry"].apply(lambda x: x.__geo_interface__)
+borough_geo["geojson"] = borough_geo["geometry"].apply(
+    lambda x: x.__geo_interface__
+)
+precinct_geo["geojson"] = precinct_geo["geometry"].apply(
+    lambda x: x.__geo_interface__
+)
 
-# Normalize the GeoJSON data
-geo_data = pd.json_normalize(nyc_full["geojson"])
-geo_data["Borough"] = nyc_full["Borough"]
-geo_data["Arrests"] = nyc_full["Arrests"]
+geo_b_df = pd.json_normalize(borough_geo["geojson"])
+geo_b_df["Borough"] = borough_geo["Borough"]
+geo_b_df["Arrests"] = borough_geo["Arrests"]
 
-
-# Create map altair object
-map_chart = alt.Chart(
-    geo_data,
-    width=600,
-    height=500
-).mark_geoshape(
-    stroke='grey'
-).project(
-    'albersUsa'
-).encode(
-    color='Arrests',
-    tooltip=['Borough', alt.Tooltip('Arrests', format=',')]
-).to_dict()
+geo_p_df = pd.json_normalize(precinct_geo["geojson"])
+geo_p_df["Precinct"] = precinct_geo["Precinct"]
+geo_p_df["Arrests"] = precinct_geo["Arrests"]
 
 
 # Group the data by the more general offense description (OFNS_DESC)
@@ -101,7 +92,8 @@ arrest_crimes.columns = ['Crime Type', 'Frequency']
 top_crimes = arrest_crimes.head(10)
 
 
-colors = ['#E63946', '#1D3557', '#F1FAEE', '#457B9D', '#A8DADC', '#F1FAEE', '#1D3557', '#E63946', '#457B9D', '#A8DADC']
+colors = ['#E63946', '#1D3557', '#F1FAEE', '#457B9D', '#A8DADC',
+          '#F1FAEE', '#1D3557', '#E63946', '#457B9D', '#A8DADC']
 
 # Create the pie chart for the top 10 crime types
 crime_pie_chart = px.pie(
@@ -127,28 +119,28 @@ crime_pie_chart.update_layout(showlegend=False)
 # Remove the arrow from the tooltip and set white background
 crime_pie_chart.update_layout(
     hoverlabel=dict(
-        bgcolor="white",   
-        font_size=14,      
-        font_family="Arial" 
+        bgcolor="white",
+        font_size=14,
+        font_family="Arial"
     )
 )
-
-
-
-
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
-
-# Layout 
+# Layout
 app.layout = dbc.Container([
     html.H1("NYPD Arrests Map"),
+    dbc.Switch(
+        id='map-toggle',
+        label='Toggle Precincts/Boroughs',
+        value=False
+    ),
     dbc.Row([
         # Column for the map
         dbc.Col(
             [
-                dvc.Vega(spec=map_chart) 
+                dvc.Vega(id='map', spec={})
             ],
             md=8
         ),
@@ -166,6 +158,36 @@ app.layout = dbc.Container([
 ])
 
 
+# Create map chart function
+@callback(
+    Output('map', 'spec'),
+    Input('map-toggle', 'value')
+)
+def create_map_chart(toggle_value):
+    # Toggle controls whether the map displays boroughs or precincts
+    if toggle_value:
+        geo_df = geo_p_df
+        tooltip_label = 'Precinct'
+    else:
+        geo_df = geo_b_df
+        tooltip_label = 'Borough'
+
+    # Create map
+    map_chart = alt.Chart(
+        geo_df,
+        width=600,
+        height=500
+    ).mark_geoshape(
+        stroke='grey'
+    ).project(
+        'albersUsa'
+    ).encode(
+        color='Arrests',
+        tooltip=[tooltip_label, alt.Tooltip('Arrests', format=',')]
+    ).to_dict()
+
+    return map_chart
+
 # Run the app/dashboard
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    server.run()
