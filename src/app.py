@@ -213,7 +213,7 @@ sidebar = dbc.Collapse(
 
 # Sidebar toggle button
 collapse_button = dbc.Button(
-    "☰ Customization",
+    "☰ Additional Filters",
     id="collapse-button",
     style={
         'width': '150px',
