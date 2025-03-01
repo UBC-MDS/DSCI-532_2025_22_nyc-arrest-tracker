@@ -179,6 +179,12 @@ age_pie_chart = create_pie_chart(age_data, "Arrests by Age Group")
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
+
+# Calculate min and max dates from the data
+min_date = nyc_arrests['ARREST_DATE'].min()  
+max_date = nyc_arrests['ARREST_DATE'].max() 
+
+
 # Sidebar for displaying filters and customization options
 sidebar = dbc.Collapse(
     html.Div(
@@ -194,6 +200,23 @@ sidebar = dbc.Collapse(
                 placeholder="Select crime types (empty for all)",
                 className="mb-3"
             ),
+
+            # Update the DatePickerRange
+            html.Label("Select Date Range:"),
+            dcc.DatePickerRange(
+                id='date-picker-range',
+                start_date=min_date,  # Set the start date as the minimum date from the data
+                end_date=max_date,    # Set the end date as the maximum date from the data
+                display_format='MM-DD',  # Format for the displayed date
+                className="mb-3",
+                min_date_allowed=min_date,  # Restrict selection to the min_date
+                max_date_allowed=max_date  # Restrict selection to the max_date
+                
+            ),
+
+            
+
+
             dbc.Button(
                 "Reset All Charts",
                 id="reset-button",
@@ -225,6 +248,9 @@ sidebar = dbc.Collapse(
     is_open=False,  # Start collapsed
 )
 
+
+
+
 # Sidebar toggle button
 collapse_button = dbc.Button(
     "☰ Additional Filters",
@@ -233,9 +259,10 @@ collapse_button = dbc.Button(
         'width': '150px',
         'background-color': 'white',
         'color': 'steelblue',
-        'margin-top': 10,
+        'margin-top': 10
     }
 )
+
 
 # Layout
 app.layout = dbc.Container([
