@@ -113,13 +113,12 @@ crime_colors = ['#E63946', '#1D3557', '#F1FAEE', '#457B9D', '#A8DADC',
 gender_colors = ['#1D3557', '#E63946', '#457B9D']  # Colors for M, F, U/Other
 age_colors = ['#1D3557', '#E63946', '#457B9D', '#A8DADC', '#90A955', '#F77F00']  # Colors for different age groups
 
-def create_pie_chart(data, title):
+def create_pie_chart(data):
     """
     Create a pie chart with consistent styling.
     
     Parameters:
     data (pd.DataFrame): DataFrame with at least two columns - one for names and one for values
-    title (str): Title for the pie chart
     
     Returns:
     plotly.graph_objects.Figure: A pie chart figure
@@ -144,7 +143,6 @@ def create_pie_chart(data, title):
         data,
         names=name_col, 
         values='Arrests',   
-        title=title,
         labels={'Arrests': 'Number of Arrests'},
         color=name_col,  
         color_discrete_sequence=color_sequence 
@@ -170,11 +168,15 @@ def create_pie_chart(data, title):
     return pie_chart
 
 
+# Calculate min and max dates from the data
+min_date = nyc_arrests['ARREST_DATE'].min()  
+max_date = nyc_arrests['ARREST_DATE'].max() 
+
 # Create the initial pie charts
 crime_pie_data = top_crimes.rename(columns={'Crime Type': 'OFNS_DESC', 'Frequency': 'Arrests'})
-crime_pie_chart = create_pie_chart(crime_pie_data, "Top 10 Crime Types")
-gender_pie_chart = create_pie_chart(gender_data, "Arrests by Gender")
-age_pie_chart = create_pie_chart(age_data, "Arrests by Age Group")
+crime_pie_chart = create_pie_chart(crime_pie_data)
+gender_pie_chart = create_pie_chart(gender_data)
+age_pie_chart = create_pie_chart(age_data)
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
@@ -193,6 +195,37 @@ sidebar = dbc.Collapse(
                 multi=True,
                 placeholder="Select crime types (empty for all)",
                 className="mb-3"
+            ),
+
+            # Update the DatePickerRange
+            html.Label("Select Date Range:"),
+            dcc.DatePickerRange(
+                id='date-picker-range',
+                start_date=min_date,  # Set the start date as the minimum date from the data
+                end_date=max_date,    # Set the end date as the maximum date from the data
+                display_format='MM-DD',  # Format for the displayed date
+                className="mb-3",
+                min_date_allowed=min_date,  # Restrict selection to the min_date
+                max_date_allowed=max_date  # Restrict selection to the max_date
+                
+            ),
+
+            
+
+
+            dbc.Button(
+                "Reset All Charts",
+                id="reset-button",
+                color="primary",
+                className="mr-1 mb-3",
+                n_clicks=0,
+                style={
+                    "position": "absolute",  # Keeps the button fixed in place
+                    "bottom": "20px",        # Position it at the bottom of the sidebar
+                    "width": "80%",          # Give it a fixed width (or adjust as needed)
+                    "left": "50%",           # Center the button horizontally
+                    "transform": "translateX(-50%)"  # This makes sure it's perfectly centered
+                }
             )
         ],
         style={
@@ -219,9 +252,10 @@ collapse_button = dbc.Button(
         'width': '150px',
         'background-color': 'white',
         'color': 'steelblue',
-        'margin-top': 10,
+        'margin-top': 10
     }
 )
+
 
 # Layout
 app.layout = dbc.Container([
@@ -241,24 +275,44 @@ app.layout = dbc.Container([
         # Column for the pie charts (placed right)
         dbc.Col(
             [
-                dcc.Graph(
-                    id='crime-pie-chart',
-                    figure=crime_pie_chart
-                ),
-                dcc.Graph(
-                    id='gender-pie-chart',
-                    figure=gender_pie_chart
-                ),
-                dcc.Graph(
-                    id='age-pie-chart',
-                    figure=age_pie_chart
-                ),
-                # Reset button
-                dbc.Button("Reset All Charts", id="reset-button", color="primary", className="mr-1 mb-3", n_clicks=0)
+                # Wrapper for all pie charts
+                html.Div([
+                    # First Pie Chart: Crime Types
+                    html.Div([
+                        html.H5("Top 10 Crime Types", className="text-center", style={"margin-bottom": "0px", "padding-bottom": "5px"}),  # Title close to chart
+                        dcc.Graph(
+                            id='crime-pie-chart',
+                            figure=crime_pie_chart,
+                            style={'height': '250px', 'margin-bottom': '10px'}  # Reduce space below chart
+                        ),
+                    ], style={'margin-bottom': '10px'}),  # Margin between charts
+
+                    # Second Pie Chart: Gender Distribution
+                    html.Div([
+                        html.H5("Arrests by Gender", className="text-center", style={"margin-bottom": "0px", "padding-bottom": "5px"}),  # Title close to chart
+                        dcc.Graph(
+                            id='gender-pie-chart',
+                            figure=gender_pie_chart,
+                            style={'height': '250px', 'margin-bottom': '10px'}  # Reduce space below chart
+                        ),
+                    ], style={'margin-bottom': '10px'}),  # Margin between charts
+
+                    # Third Pie Chart: Age Distribution
+                    html.Div([
+                        html.H5("Arrests by Age Group", className="text-center", style={"margin-bottom": "0px", "padding-bottom": "5px"}),  # Title close to chart
+                        dcc.Graph(
+                            id='age-pie-chart',
+                            figure=age_pie_chart,
+                            style={'height': '250px'}  # Reduce space below chart
+                        ),
+                    ])
+                ], style={'textAlign': 'center', 'padding': '0 10px'}),  # Center the charts and control padding
+
             ],
-            md=4
+            md=4,
+            style={'height': 'auto', 'overflow': 'auto'}  # Auto-height for the column
         )
-    ])
+    ], justify="center", align="start")
 ], fluid=True)
 
 
