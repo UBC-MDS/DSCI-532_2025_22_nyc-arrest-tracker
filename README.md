@@ -9,6 +9,15 @@ The NYPD Arrest Tracker is a dashboard that provides executive leaders in the Ne
 This dashboard helps government leaders assess the effectiveness of their policies and initiatives related to crime prevention and public safety. By analyzing arrest trends, crime type distributions, and demographic data, users can quickly gain insights into current law enforcement trends and make informed decisions.
 
 
+### Deployed Link:
+
+[Access the deployed dashboard here](https://dsci-532-2025-22-nyc-arrest-tracker.onrender.com/)
+
+### Demo GIF:
+
+![Check out the demo GIF here to see the dashboard in action.](img/demo.gif)
+
+
 ### What You Can Do: 
 
 - View Arrest Locations: The interactive map shows precincts and boroughs in NYC. Hover over locations for tooltips and click on them to get detailed arrest statistics.
@@ -16,15 +25,6 @@ This dashboard helps government leaders assess the effectiveness of their polici
 - Examine Demographics: Use pie charts to explore arrests by gender and age group.
 - Filter Data: Use the sidebar to filter data by crime type, and toggle between precinct and borough views on the map.
 - Customize Map View: Switch between viewing precinct locations and borough locations on the map with the toggle button.
-
-
-### Deployed Link:
-
-[Access the deployed dashboard here](https://dsci-532-2025-22-nyc-arrest-tracker.onrender.com/)
-
-### Demo GIF:
-
-Check out the demo GIF here to see the dashboard in action.
 
 
 ### Support
