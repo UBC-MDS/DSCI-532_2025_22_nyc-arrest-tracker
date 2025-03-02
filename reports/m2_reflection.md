@@ -1,4 +1,4 @@
-# NYPD Arrest Tracker App Proposal
+# NYPD Arrest Tracker Reflection
 
 **Authors**: Michael Gelfand, Hala Arar, Michael Hewlett
 
@@ -14,6 +14,10 @@
 
 ## What has not been implemented and why
 
+- Functioning date selector: Not yet implemented as it proved too complex to implement in the time frame and we already had enough inputs and ouputs.
+- Density plot: Removed as it would make the dashboard too cluttered.
+- Month slider: incorporated into the date selector.
+
 ## What was implemented differently and why
 
 - Chart for relative frequency of crime type: We intended to implement this as a bar chart but had difficulties so we have implemented it as a pie chart
@@ -23,8 +27,7 @@
 - Sidebar expanding does not shift the main content over, instead it covers the content
 - Null value present in crime type filter
 - Reset charts button only resets charts, not the map, which can lead to a misleading display
-
-## Deviations from 531 best practices
+- Date selector does not update the map or charts
 
 ## What the dashboard does well
 
@@ -38,11 +41,11 @@
 
 ## Potential future improvements and additions
 
-Chart reset button
+### Chart reset button
 
 - Currently only resets borough/precinct selection, not crime type selection. We need to think through the user flow for resetting charts in general, e.g. to what extent we want them to reset individual charts vs resetting everything.
 
-Crime type filter
+### Crime type filter
 
 - Displaying crime types as a grid of checkboxes. Right now the dropdown menu is a clunky UI.
 - Display crime types using 'Sentence case'
@@ -50,7 +53,8 @@ Crime type filter
 - Make the option to 'clear all' selected crime types more obvious
 - Add function to sort crime types in selection display by frequency
 
-Pie charts
+### Pie charts
 
 - Hover over percentage should match rounding to 1 decimal place
 - For gender and age, those categories should be displayed without the hover - e.g. the gender pie chart should have "Male" and "Female" printed without needing to hover
+- Layout should be better, currently the pie charts are too large
