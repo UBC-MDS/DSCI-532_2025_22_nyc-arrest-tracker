@@ -301,6 +301,55 @@ app.layout = dbc.Container([
             ],
             md=4
         )
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.Div([
+                html.P(
+                    '''
+                    This dashboard visualizes arrest data from the New York 
+                    Police Department. It is made for policy makers to 
+                    understand the distribution of arrests across New York 
+                    City.
+                    ''',
+                    style={
+                        "font-size": "12px",
+                        'width': '50%',
+                        'margin-left': '0px',
+                        'color': 'black'
+                    }
+                ),
+                html.P(
+                    "Creators: Michael Gelfand, Michael Hewlett, Hala Arar",
+                    style={
+                        "font-size": "12px",
+                        'width': '50%',
+                        'margin-left': '0px',
+                        'color': 'black'
+                    }
+                ),
+                html.A(
+                    "GitHub Repository",
+                    href="https://github.com/UBC-MDS/DSCI-532_2025_22_nyc-arrest-tracker",
+                    target="_blank",
+                    style={
+                       "font-size": "12px",
+                       'width': '50%',
+                       'margin-left': '0px',
+                       'color': '#00BFFF'
+                    }
+                ),
+                html.P(
+                    "Last updated on March 1st, 2025",
+                    style={
+                        "font-size": "12px",
+                        'width': '50%',
+                        'margin-left': '0px',
+                        'color': 'black'
+                        }
+                    ),
+            ])
+        ], width=12),
     ])
 ], fluid=True)
 
