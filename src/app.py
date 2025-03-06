@@ -38,16 +38,6 @@ nyc_precinct['precinct'] = pd.to_numeric(
     errors='coerce'
 )
 
-# Grouped data for initial visualization
-arrest_data_grp_borough = nyc_arrests.groupby(
-    "borough"
-).size().reset_index(name='counts')
-
-# Group by precinct
-arrest_data_grp_precinct = nyc_arrests.groupby(
-    "ARREST_PRECINCT"
-).size().reset_index(name='counts')
-
 # Gender and Age data preparation
 # Create default gender data for all arrests (citywide)
 gender_data = pd.DataFrame({
@@ -60,41 +50,6 @@ age_data = pd.DataFrame({
     'AGE_GROUP': nyc_arrests['AGE_GROUP'].value_counts().index,
     'Arrests': nyc_arrests['AGE_GROUP'].value_counts().values
 })
-
-# Merge arrest data with GeoJSON data
-precinct_geo = nyc_precinct.merge(
-    arrest_data_grp_precinct,
-    how="left",
-    left_on="precinct",
-    right_on="ARREST_PRECINCT"
-).rename(
-    columns={"precinct": "Precinct", "counts": "Arrests"}
-)[["Precinct", "Arrests", "geometry"]]
-
-borough_geo = arrest_data_grp_borough.merge(
-    nyc_boroughs,
-    how="left",
-    left_on="borough",
-    right_on="name"
-).rename(
-    columns={"borough": "Borough", "counts": "Arrests"}
-)[["Borough", "Arrests", "geometry"]]
-
-# Convert GeoDataFrame to DataFrame
-borough_geo["geojson"] = borough_geo["geometry"].apply(
-    lambda x: x.__geo_interface__
-)
-precinct_geo["geojson"] = precinct_geo["geometry"].apply(
-    lambda x: x.__geo_interface__
-)
-
-geo_b_df = pd.json_normalize(borough_geo["geojson"])
-geo_b_df["Borough"] = borough_geo["Borough"]
-geo_b_df["Arrests"] = borough_geo["Arrests"]
-
-geo_p_df = pd.json_normalize(precinct_geo["geojson"])
-geo_p_df["Precinct"] = precinct_geo["Precinct"]
-geo_p_df["Arrests"] = precinct_geo["Arrests"]
 
 # Group the data by the more general offense description (OFNS_DESC)
 arrest_crimes = nyc_arrests['OFNS_DESC'].value_counts().reset_index()
@@ -395,7 +350,7 @@ def create_map_chart(toggle_value, crime_types):
     
     # Update geo data with filtered counts
     if toggle_value:  # Precinct view
-        precinct_geo_filtered = nyc_precinct.merge(
+        geo_df = nyc_precinct.merge(
             arrest_data_grp_precinct_filtered,
             how="left",
             left_on="precinct",
@@ -403,34 +358,16 @@ def create_map_chart(toggle_value, crime_types):
         ).rename(
             columns={"precinct": "Precinct", "counts": "Arrests"}
         )[["Precinct", "Arrests", "geometry"]]
-        
-        precinct_geo_filtered["Arrests"] = precinct_geo_filtered["Arrests"].fillna(0)
-        precinct_geo_filtered["geojson"] = precinct_geo_filtered["geometry"].apply(
-            lambda x: x.__geo_interface__
-        )
-        
-        geo_df = pd.json_normalize(precinct_geo_filtered["geojson"])
-        geo_df["Precinct"] = precinct_geo_filtered["Precinct"]
-        geo_df["Arrests"] = precinct_geo_filtered["Arrests"]
         tooltip_label = 'Precinct'
     else:  # Borough view
-        borough_geo_filtered = arrest_data_grp_borough_filtered.merge(
-            nyc_boroughs,
+        geo_df = nyc_boroughs.merge(
+            arrest_data_grp_borough_filtered,
             how="left",
-            left_on="borough",
-            right_on="name"
+            left_on="name",
+            right_on="borough"
         ).rename(
             columns={"borough": "Borough", "counts": "Arrests"}
         )[["Borough", "Arrests", "geometry"]]
-        
-        borough_geo_filtered["Arrests"] = borough_geo_filtered["Arrests"].fillna(0)
-        borough_geo_filtered["geojson"] = borough_geo_filtered["geometry"].apply(
-            lambda x: x.__geo_interface__
-        )
-        
-        geo_df = pd.json_normalize(borough_geo_filtered["geojson"])
-        geo_df["Borough"] = borough_geo_filtered["Borough"]
-        geo_df["Arrests"] = borough_geo_filtered["Arrests"]
         tooltip_label = 'Borough'
 
     select_region = alt.selection_point(
