@@ -1,8 +1,8 @@
 from dash import Output, Input, callback
 import altair as alt
 
-from data import nyc_arrests, nyc_boroughs, nyc_precinct
-from utils import filter_data_by_crime_type
+from src.data import nyc_arrests, nyc_boroughs, nyc_precinct
+from src.utils import filter_data_by_crime_type
 
 
 # Create map chart function

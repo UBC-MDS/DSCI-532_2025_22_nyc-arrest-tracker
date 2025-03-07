@@ -1,8 +1,8 @@
 import dash_bootstrap_components as dbc
 from dash import Dash
 
-import callbacks
-from components import (
+from . import callbacks
+from .components import (
     age_pie_chart,
     collapse_button,
     crime_pie_chart,

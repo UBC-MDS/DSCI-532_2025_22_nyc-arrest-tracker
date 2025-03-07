@@ -1,8 +1,8 @@
 from dash import Output, Input, callback, callback_context
 import pandas as pd
 
-from data import nyc_arrests
-from utils import (
+from src.data import nyc_arrests
+from src.utils import (
     filter_data_by_crime_type,
     get_selected_location,
     filter_data_by_location,

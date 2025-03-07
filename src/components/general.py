@@ -1,7 +1,7 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 
-from data import all_crime_types, min_date, max_date
+from src.data import all_crime_types, min_date, max_date
 
 # Dropdown for selecting crime types
 crime_type_dropdown = dcc.Dropdown(

@@ -1,7 +1,7 @@
 from dash import dcc
 
-from data import crime_pie_data, gender_data, age_data
-from utils import create_pie_chart
+from src.data import crime_pie_data, gender_data, age_data
+from src.utils import create_pie_chart
 
 # Crime frequency pie chart
 crime_pie_chart = dcc.Graph(
