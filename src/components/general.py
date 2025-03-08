@@ -52,6 +52,21 @@ collapse_button = dbc.Button(
     }
 )
 
+# Apply button
+apply_button = dbc.Button(
+    "Apply",
+    id="apply-button",
+    color="success",
+    className="mb-3",
+    n_clicks=0,
+    style={
+        "width": "80%", 
+        "margin-top": "10px",
+        "left": "50%",
+        "transform": "translateX(-50%)"
+    }
+)
+
 # Reset button
 reset_button = dbc.Button(
     "Reset All Charts",
@@ -80,6 +95,7 @@ sidebar = dbc.Collapse(
             # Update the DatePickerRange
             html.Label("Select Date Range:"),
             date_filter,
+            apply_button,
             reset_button
         ],
         style={

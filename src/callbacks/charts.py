@@ -1,4 +1,4 @@
-from dash import Output, Input, callback, callback_context
+from dash import Output, Input, State, callback, callback_context
 import pandas as pd
 
 from src.data import nyc_arrests
@@ -16,19 +16,19 @@ from src.utils import (
      Output('gender-pie-chart', 'figure'),
      Output('age-pie-chart', 'figure')],
     [Input('map', 'signalData'),
-     Input('crime-type-dropdown', 'value'),
-     Input('reset-button', 'n_clicks')]
+     Input('apply-button', 'n_clicks'),
+     Input('reset-button', 'n_clicks')],
+    [State('crime-type-dropdown', 'value')]
 )
-def update_all_pie_charts(clicked_region, crime_types, n_clicks):
+def update_all_pie_charts(clicked_region, apply_clicks, reset_clicks, crime_types):
     ctx = callback_context
 
     # Get the ID of the component that triggered the callback
+    triggered_id = None
     if ctx.triggered:
         triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
-    else:
-        triggered_id = None
 
-    # First filter the data by crime types
+    # First get unfiltered data
     filtered_by_crime = nyc_arrests
 
     # Format crime types for display
@@ -39,8 +39,8 @@ def update_all_pie_charts(clicked_region, crime_types, n_clicks):
     else:
         crime_type_display = f" - Selected Crimes ({len(crime_types)})"
 
-    # Apply crime type filter
-    if crime_types:
+    # Apply crime type filter ONLY if the apply button was clicked
+    if triggered_id == "apply-button" and crime_types:
         filtered_by_crime = filter_data_by_crime_type(nyc_arrests, crime_types)
 
     # Get selected location from map click
@@ -62,13 +62,14 @@ def update_all_pie_charts(clicked_region, crime_types, n_clicks):
         filtered_data = filtered_by_crime
         location_label_display = ""
 
-    # Reset button was clicked - reset location but keep crime type filter
+    # Reset button was clicked - reset to original unfiltered data
     if triggered_id == "reset-button":
-        filtered_data = filtered_by_crime
+        filtered_data = nyc_arrests
         location_label_display = ""
+        crime_type_display = ""
 
-    # Create crime chart
-    if crime_types and len(crime_types) <= 3:
+    # Create crime chart - adjust based on what triggered the update
+    if triggered_id == "apply-button" and crime_types and len(crime_types) <= 3:
         # When specific crimes are selected and not too many,
         # show distribution among those crimes
         crime_counts = (filtered_data
