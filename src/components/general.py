@@ -70,7 +70,7 @@ apply_button = dbc.Button(
 
 # Reset button
 reset_button = dbc.Button(
-    "Reset All Charts",
+    "Reset",
     id="reset-button",
     color="primary",
     className="mr-1 mb-3",
