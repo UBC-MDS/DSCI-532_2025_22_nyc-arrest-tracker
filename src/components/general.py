@@ -41,7 +41,7 @@ date_filter = dcc.DatePickerRange(
 
 # Sidebar toggle button
 collapse_button = dbc.Button(
-    "☰ Additional Filters",
+    "☰ Filters",
     id="collapse-button",
     n_clicks=0,  # Ensure this is explicitly set
     style={
@@ -49,6 +49,22 @@ collapse_button = dbc.Button(
         'background-color': 'white',
         'color': 'steelblue',
         'margin-top': 10
+    }
+)
+
+# Apply button
+apply_button = dbc.Button(
+    "Apply",
+    id="apply-button",
+    color="success",
+    className="mb-3",
+    n_clicks=0,
+    style={
+        "position": "absolute",  
+        "bottom": "70px",        
+        "width": "80%",          
+        "left": "50%",           
+        "transform": "translateX(-50%)"
     }
 )
 
@@ -80,6 +96,7 @@ sidebar = dbc.Collapse(
             # Update the DatePickerRange
             html.Label("Select Date Range:"),
             date_filter,
+            apply_button,
             reset_button
         ],
         style={
