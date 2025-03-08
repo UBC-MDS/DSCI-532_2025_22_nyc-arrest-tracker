@@ -41,7 +41,7 @@ date_filter = dcc.DatePickerRange(
 
 # Sidebar toggle button
 collapse_button = dbc.Button(
-    "☰ Additional Filters",
+    "☰ Filters",
     id="collapse-button",
     n_clicks=0,  # Ensure this is explicitly set
     style={
