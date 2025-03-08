@@ -60,9 +60,10 @@ apply_button = dbc.Button(
     className="mb-3",
     n_clicks=0,
     style={
-        "width": "80%", 
-        "margin-top": "10px",
-        "left": "50%",
+        "position": "absolute",  
+        "bottom": "70px",        
+        "width": "80%",          
+        "left": "50%",           
         "transform": "translateX(-50%)"
     }
 )
