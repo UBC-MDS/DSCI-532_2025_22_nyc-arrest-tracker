@@ -15,6 +15,7 @@ from .components import (
 
 # Initialization
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
 
 # Layout
 app.layout = dbc.Container([
@@ -37,5 +38,5 @@ app.layout = dbc.Container([
 
 # Run the app/dashboard
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    server.run()
 
