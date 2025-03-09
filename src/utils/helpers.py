@@ -127,15 +127,34 @@ def create_pie_chart(data, title):
     """
 
     # Color schemes
-    crime_colors = ['#E63946', '#1D3557', '#F1FAEE', '#457B9D', '#A8DADC',
-                    '#F1FAEE', '#1D3557', '#E63946', '#457B9D', '#A8DADC']
+    crime_colors = [
+    '#1D3557',  # Dark navy blue (NYPD uniform)
+    '#E63946',  # Red (emergency color)
+    '#FFD700',  # Gold (badge color)
+    '#A8DADC',  # Light blue (badge accent)
+    '#F1FAEE',  # Off-white (police car)
+    '#D62828',  # Dark red
+    '#6A994E',  # Olive green (tactical)
+    '#4A5859',  # Slate gray
+    '#FF9F1C',  # Amber/orange
+    '#03045E',  # Very dark blue (distinct from navy)
+    '#9D0208',  # Dark crimson
+    '#7B2CBF',  # Purple (for contrast)
+    '#FB8500',  # Bright orange
+    '#2A9D8F',  # Teal
+    '#264653'   # Dark slate blue-gray
+]
 
-    # Colors for M, F, U/Other
-    gender_colors = ['#1D3557', '#E63946', '#457B9D']
+    gender_colors = ['#1D3557', '#E63946', '#FFD700']
 
-    # Colors for age groups
-    age_colors = ['#1D3557', '#E63946', '#457B9D',
-                  '#A8DADC', '#90A955', '#F77F00']
+    age_colors = [
+        '#1D3557',  # Dark blue
+        '#E63946',  # Red
+        '#457B9D',  # Medium blue
+        '#A8DADC',  # Light blue
+        '#FFD700',  # Gold
+        '#003049'   # Dark navy
+    ]
 
     # Get the column names - one will be 'Arrests',
     # the other is the category name
