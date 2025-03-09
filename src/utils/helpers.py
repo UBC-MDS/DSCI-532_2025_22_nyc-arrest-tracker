@@ -128,36 +128,35 @@ def create_pie_chart(data, title):
 
     # Color schemes
     crime_colors = [
-    '#1D3557',  # Dark navy blue (NYPD uniform)
-    '#E63946',  # Red (emergency color)
-    '#FFD700',  # Gold (badge color)
-    '#A8DADC',  # Light blue (badge accent)
-    '#F1FAEE',  # Off-white (police car)
-    '#D62828',  # Dark red
-    '#6A994E',  # Olive green (tactical)
-    '#4A5859',  # Slate gray
-    '#FF9F1C',  # Amber/orange
-    '#03045E',  # Very dark blue (distinct from navy)
-    '#9D0208',  # Dark crimson
-    '#7B2CBF',  # Purple (for contrast)
-    '#FB8500',  # Bright orange
-    '#2A9D8F',  # Teal
-    '#264653'   # Dark slate blue-gray
+    '#1D3557',  
+    '#E63946',  
+    '#FFD700',  
+    '#A8DADC',  
+    '#F1FAEE',  
+    '#D62828',  
+    '#6A994E',  
+    '#4A5859',  
+    '#FF9F1C',  
+    '#03045E',  
+    '#9D0208',  
+    '#7B2CBF',  
+    '#FB8500',  
+    '#2A9D8F',  
+    '#264653'   
 ]
 
     gender_colors = ['#1D3557', '#E63946', '#FFD700']
 
     age_colors = [
-        '#1D3557',  # Dark blue
-        '#E63946',  # Red
-        '#457B9D',  # Medium blue
-        '#A8DADC',  # Light blue
-        '#FFD700',  # Gold
-        '#003049'   # Dark navy
+        '#1D3557',  
+        '#E63946',  
+        '#457B9D',  
+        '#A8DADC',  
+        '#FFD700',  
+        '#003049'   
     ]
 
-    # Get the column names - one will be 'Arrests',
-    # the other is the category name
+    
     columns = list(data.columns)
 
     # The name column is the one that's not 'Arrests'
@@ -203,7 +202,7 @@ def create_pie_chart(data, title):
             font_family="Arial"
         ),
         
-        height=200,  
+        height=190,  
         margin=dict(l=10, r=10, t=30, b=10),  
         title=dict(
             text=title,
@@ -250,3 +249,100 @@ def create_empty_pie_chart():
     )
 
     return pie_chart
+
+
+def create_bar_chart(data, title):
+    """
+    Create a bar chart for top crimes.
+
+    Parameters:
+    data (pd.DataFrame): DataFrame with at least two columns - crime type and count
+    title (str): Title for the bar chart
+
+    Returns:
+    plotly.graph_objects.Figure: A bar chart figure
+    """
+    # Take only top 5 crimes
+    if len(data) > 5:
+        data = data.head(5)
+    
+    # Instead of different colors per bar, use a single NYPD blue color
+    # for a more professional look
+    bar_color = '#1D3557'  # Dark navy blue (NYPD uniform)
+    
+    # Get the column names - one will be 'Arrests', the other is the category name
+    columns = list(data.columns)
+    name_col = [col for col in columns if col != 'Arrests'][0]
+    
+    # Create horizontal bar chart with consistent coloring
+    bar_chart = px.bar(
+        data,
+        y=name_col,  # Use crime type as y-axis for horizontal bars
+        x='Arrests',
+        title=title,
+        labels={'Arrests': 'Number of Arrests'},
+        orientation='h',  # Horizontal orientation
+        color_discrete_sequence=[bar_color]  # Use single color for all bars
+    )
+    
+    # Customize hover information
+    bar_chart.update_traces(
+        hovertemplate='<b>%{y}</b><br>Arrests: %{x:,}<extra></extra>'
+    )
+    
+    # Improve layout and styling
+    bar_chart.update_layout(
+        showlegend=False,
+        height=240,
+        margin=dict(l=10, r=10, t=30, b=10),
+        title=dict(
+            text=title,
+            font=dict(size=14),
+            x=0.5,
+            y=0.95
+        ),
+        plot_bgcolor='white',
+        yaxis=dict(
+            title='',
+            automargin=True,
+            tickfont=dict(size=11)  # Smaller text for crime names
+        ),
+        xaxis=dict(
+            title='Number of Arrests',
+            titlefont=dict(size=11),
+            showgrid=True,
+            gridcolor='lightgray',
+            gridwidth=0.5
+        )
+    )
+    
+    # Add value labels at the end of each bar
+    bar_chart.update_traces(
+        texttemplate='%{x:,}',
+        textposition='outside',
+        textfont=dict(size=11)
+    )
+    
+    
+    return bar_chart
+
+
+
+def create_empty_bar_chart():
+    """Create an empty bar chart with a message."""
+    fig = px.bar(x=[], y=[])
+    fig.update_layout(
+        title="No Data Available",
+        annotations=[
+            dict(
+                text="No data available for the selected filters",
+                showarrow=False,
+                xref="paper",
+                yref="paper",
+                x=0.5,
+                y=0.5
+            )
+        ],
+        height=300
+    )
+    return fig

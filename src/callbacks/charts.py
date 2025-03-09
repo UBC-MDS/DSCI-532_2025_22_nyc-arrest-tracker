@@ -7,6 +7,7 @@ from src.utils import (
     get_selected_location,
     filter_data_by_location,
     create_pie_chart,
+    create_bar_chart,  # Add this import
     filter_data_by_date_range,
     create_empty_pie_chart
 )
@@ -14,7 +15,7 @@ from src.utils import (
 
 # Consolidated callback for all pie charts
 @callback(
-    [Output('crime-pie-chart', 'figure'),
+    [Output('crime-bar-chart', 'figure'),  
      Output('gender-pie-chart', 'figure'),
      Output('age-pie-chart', 'figure')],
     [Input('map', 'signalData'),
@@ -82,7 +83,7 @@ def update_all_pie_charts(
 
     if filtered_data.empty:
         return (
-            create_empty_pie_chart(),
+            create_empty_bar_chart(),
             create_empty_pie_chart(),
             create_empty_pie_chart()
         )
@@ -109,14 +110,14 @@ def update_all_pie_charts(
             .size()
             .reset_index(name='Arrests')
             .sort_values(by='Arrests', ascending=False)
-            .head(10)
+            .head(5)
         )
         crime_title = (
-            f"Top 10 Crime Types{location_label_display}"
+            f"Top 5 Crime Types{location_label_display}"
             f"{crime_type_display}"
         )
 
-    updated_crime_chart = create_pie_chart(crime_counts, crime_title)
+    updated_crime_chart = create_bar_chart(crime_counts, crime_title)
 
     # Create gender chart
     gender_counts = filtered_data['PERP_SEX'].value_counts()
