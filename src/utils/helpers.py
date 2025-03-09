@@ -327,14 +327,7 @@ def create_bar_chart(data, title):
             gridwidth=0.5
         )
     )
-    
-    # Add value labels at the end of each bar
-    bar_chart.update_traces(
-        texttemplate='%{x:,}',
-        textposition='outside',
-        textfont=dict(size=11)
-    )
-    
+
     return bar_chart
 
 
