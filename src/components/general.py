@@ -40,15 +40,24 @@ date_filter = dcc.DatePickerRange(
 )
 
 # Sidebar toggle button
-collapse_button = dbc.Button(
-    "☰ Filters",
-    id="collapse-button",
-    n_clicks=0,  # Ensure this is explicitly set
+collapse_button = dbc.Col(
+    dbc.Button(
+        "☰ Filters",
+        id="collapse-button",
+        n_clicks=0,  # Ensure this is explicitly set
+        style={
+            'width': '150px',
+            'background-color': 'white',
+            'color': 'steelblue',
+            'margin-top': 10
+        }
+    ),
+    width="auto",
     style={
-        'width': '150px',
-        'background-color': 'white',
-        'color': 'steelblue',
-        'margin-top': 10
+        "position": "absolute",
+        "top": "20px",
+        "right": "20px",
+        "z-index": "1050"
     }
 )
 
@@ -178,4 +187,16 @@ footer_info = dbc.Col(
 )
 
 # Title
-title_comp = dbc.Col(html.H1("NYPD Arrests Map"), width="auto")
+title_comp = html.H1(
+    'NYPD Arrests Tracker',
+    style={
+        'backgroundColor': 'steelblue',
+        'padding': 10,
+        'color': 'white',
+        'margin-top': 10,
+        'margin-bottom': 10,
+        'text-align': 'center',
+        'font-size': '48px',
+        'border-radius': 3,
+    }
+)

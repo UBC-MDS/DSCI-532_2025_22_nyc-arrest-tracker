@@ -20,13 +20,12 @@ server = app.server
 # Layout
 app.layout = dbc.Container([
     dbc.Row([
-        title_comp,
-        dbc.Col(collapse_button, width="auto"),  # Collapse Button beside it
-    ], align="center", className="mb-3"),  # Align items and add margin
+        dbc.Col(title_comp),
+        collapse_button
+    ]),
     sidebar,
     dbc.Row([
         map_chart,
-        # Column for the pie charts (placed right)
         dbc.Col([
             crime_pie_chart,
             gender_pie_chart,
@@ -39,4 +38,3 @@ app.layout = dbc.Container([
 # Run the app/dashboard
 if __name__ == '__main__':
     server.run()
-
