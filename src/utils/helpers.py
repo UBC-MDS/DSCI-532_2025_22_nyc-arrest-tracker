@@ -182,6 +182,15 @@ def create_pie_chart(data, title):
             bgcolor="white",
             font_size=14,
             font_family="Arial"
+        ),
+        
+        height=200,  
+        margin=dict(l=10, r=10, t=30, b=10),  
+        title=dict(
+            text=title,
+            font=dict(size=14),  
+            x=0.5, 
+            y=0.95  
         )
     )
     return pie_chart
