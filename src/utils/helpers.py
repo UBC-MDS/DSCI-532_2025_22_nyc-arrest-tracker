@@ -190,6 +190,7 @@ def create_pie_chart(data, title):
             '%{percent:.2%} of Total<extra></extra>'
         ),
         textinfo='percent',
+        textposition='inside'
     )
 
     # Remove the legend to avoid large labels on the left
@@ -202,7 +203,8 @@ def create_pie_chart(data, title):
             font_size=14,
             font_family="Arial"
         ),
-
+        uniformtext_minsize=12,
+        uniformtext_mode='hide',
         height=190,  
         margin=dict(l=10, r=10, t=30, b=10),  
         title=dict(
