@@ -311,7 +311,7 @@ def create_bar_chart(data, title):
         ),
         xaxis=dict(
             title='Number of Arrests',
-            titlefont=dict(size=11),
+            tickfont=dict(size=11),
             showgrid=True,
             gridcolor='lightgray',
             gridwidth=0.5
