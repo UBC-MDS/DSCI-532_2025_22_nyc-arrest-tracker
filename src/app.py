@@ -5,7 +5,7 @@ from . import callbacks
 from .components import (
     age_pie_chart,
     collapse_button,
-    crime_pie_chart,
+    crime_bar_chart,
     footer_info,
     gender_pie_chart,
     map_chart,
@@ -25,9 +25,9 @@ app.layout = dbc.Container([
     ]),
     sidebar,
     dbc.Row([
-        map_chart,
+        dbc.Col(map_chart, md=8),
         dbc.Col([
-            crime_pie_chart,
+            crime_bar_chart,  
             gender_pie_chart,
             age_pie_chart
         ], md=4)
@@ -37,4 +37,4 @@ app.layout = dbc.Container([
 
 # Run the app/dashboard
 if __name__ == '__main__':
-    server.run()
+    server.run(debug=True)
