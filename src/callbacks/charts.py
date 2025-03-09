@@ -6,7 +6,9 @@ from src.utils import (
     filter_data_by_crime_type,
     get_selected_location,
     filter_data_by_location,
-    create_pie_chart
+    create_pie_chart,
+    filter_data_by_date_range,
+    create_empty_pie_chart
 )
 
 
@@ -18,11 +20,15 @@ from src.utils import (
     [Input('map', 'signalData'),
      Input('apply-button', 'n_clicks'),
      Input('reset-button', 'n_clicks')],
-    [State('crime-type-dropdown', 'value')]
+    [State('date-picker-range', 'start_date'),
+     State('date-picker-range', 'end_date'),
+     State('crime-type-dropdown', 'value')]
 )
-def update_all_pie_charts(clicked_region, apply_clicks, reset_clicks, crime_types):
+def update_all_pie_charts(
+    clicked_region, apply_clicks, reset_clicks,
+    start_date, end_date, crime_types
+):
     ctx = callback_context
-
     # Get the ID of the component that triggered the callback
     triggered_id = None
     if ctx.triggered:
@@ -40,8 +46,20 @@ def update_all_pie_charts(clicked_region, apply_clicks, reset_clicks, crime_type
         crime_type_display = f" - Selected Crimes ({len(crime_types)})"
 
     # Apply crime type filter ONLY if the apply button was clicked
-    if triggered_id == "apply-button" and crime_types:
-        filtered_by_crime = filter_data_by_crime_type(nyc_arrests, crime_types)
+    if triggered_id == "apply-button":
+        filtered_by_crime = filter_data_by_date_range(
+            filtered_by_crime, start_date, end_date
+        )
+        if crime_types:
+            filtered_by_crime = filter_data_by_crime_type(
+                filtered_by_crime, crime_types
+            )
+
+    # Reset button was clicked - reset to original unfiltered data
+    if triggered_id == "reset-button":
+        filtered_by_crime = nyc_arrests
+        location_label_display = ""
+        crime_type_display = ""
 
     # Get selected location from map click
     selected_location, location_label = get_selected_location(clicked_region)
@@ -62,14 +80,16 @@ def update_all_pie_charts(clicked_region, apply_clicks, reset_clicks, crime_type
         filtered_data = filtered_by_crime
         location_label_display = ""
 
-    # Reset button was clicked - reset to original unfiltered data
-    if triggered_id == "reset-button":
-        filtered_data = nyc_arrests
-        location_label_display = ""
-        crime_type_display = ""
+    if filtered_data.empty:
+        return (
+            create_empty_pie_chart(),
+            create_empty_pie_chart(),
+            create_empty_pie_chart()
+        )
 
     # Create crime chart - adjust based on what triggered the update
-    if triggered_id == "apply-button" and crime_types and len(crime_types) <= 3:
+    if (triggered_id == "apply-button" and crime_types and
+            len(crime_types) <= 3):
         # When specific crimes are selected and not too many,
         # show distribution among those crimes
         crime_counts = (filtered_data
@@ -79,7 +99,9 @@ def update_all_pie_charts(clicked_region, apply_clicks, reset_clicks, crime_type
         crime_counts = crime_counts[
             crime_counts['OFNS_DESC'].isin(crime_types)
         ]
-        crime_title = f"Selected Crime Types{location_label_display}"
+        crime_title = (
+            f"Selected Crime Types{location_label_display}{crime_type_display}"
+        )
     else:
         # Otherwise show top 10
         crime_counts = (

@@ -2,7 +2,10 @@ from dash import Output, Input, callback, State, callback_context
 import altair as alt
 
 from src.data import nyc_arrests, nyc_boroughs, nyc_precinct
-from src.utils import filter_data_by_crime_type
+from src.utils import (
+    filter_data_by_crime_type,
+    filter_data_by_date_range,
+)
 
 
 # Create map chart function
@@ -11,20 +14,30 @@ from src.utils import filter_data_by_crime_type
     [Input('map-toggle', 'value'),
      Input('apply-button', 'n_clicks'),
      Input('reset-button', 'n_clicks')],
-    [State('crime-type-dropdown', 'value')]
+    [State('date-picker-range', 'start_date'),
+     State('date-picker-range', 'end_date'),
+     State('crime-type-dropdown', 'value')]
 )
-def create_map_chart(toggle_value, apply_clicks, reset_clicks, crime_types):
+def create_map_chart(
+    toggle_value, apply_clicks, reset_clicks, start_date, end_date, crime_types
+):
     # Start with unfiltered data
     filtered_arrests = nyc_arrests
-    
+
     # Check which input triggered the callback
     ctx = callback_context
     if ctx.triggered:
         trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
-        
+
         # Only apply crime type filter if the apply button was clicked
-        if trigger_id == 'apply-button' and crime_types:
-            filtered_arrests = filter_data_by_crime_type(nyc_arrests, crime_types)
+        if trigger_id == 'apply-button':
+            filtered_arrests = filter_data_by_date_range(
+                nyc_arrests, start_date, end_date
+            )
+            if crime_types:
+                filtered_arrests = filter_data_by_crime_type(
+                    filtered_arrests, crime_types
+                )
 
         if trigger_id == 'reset-button':
             filtered_arrests = nyc_arrests

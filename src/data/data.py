@@ -21,6 +21,9 @@ nyc_arrests = pd.read_csv(arrest_path)
 
 # Remove non-existant precincts
 nyc_arrests = nyc_arrests[nyc_arrests["ARREST_PRECINCT"] != 483]
+nyc_arrests["ARREST_DATE"] = pd.to_datetime(
+    nyc_arrests["ARREST_DATE"], format="%m/%d/%Y"
+)
 
 # Map borough names to borough codes
 borough_mapping = {
@@ -63,8 +66,8 @@ top_crimes = arrest_crimes.head(10)
 all_crime_types = sorted(nyc_arrests['OFNS_DESC'].unique().tolist())
 
 # Calculate min and max dates from the data
-min_date = nyc_arrests['ARREST_DATE'].min()
-max_date = nyc_arrests['ARREST_DATE'].max()
+min_date = nyc_arrests['ARREST_DATE'].min().strftime('%Y-%m-%d')
+max_date = nyc_arrests['ARREST_DATE'].max().strftime('%Y-%m-%d')
 
 # Data for crime frequency pie chart
 crime_pie_data = top_crimes.rename(

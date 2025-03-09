@@ -1,4 +1,26 @@
 import plotly.express as px
+import pandas as pd
+
+
+# Helper function to filter data by date range
+def filter_data_by_date_range(data, start_date, end_date):
+    """
+    Filter data by selected date range
+
+    Parameters:
+    data (pd.DataFrame): DataFrame to filter
+    start_date (str): Start date of the range
+    end_date (str): End date of the range
+
+    Returns:
+    pd.DataFrame: Filtered data
+    """
+    if start_date and end_date:
+        return data[
+            (data['ARREST_DATE'] >= start_date) &
+            (data['ARREST_DATE'] <= end_date)
+        ]
+    return data
 
 
 # Helper function to filter data by crime types
@@ -162,4 +184,41 @@ def create_pie_chart(data, title):
             font_family="Arial"
         )
     )
+    return pie_chart
+
+
+def create_empty_pie_chart():
+    """
+    Creates a placeholder pie chart when no data is present.
+
+    Returns:
+    plotly.express.Figure: A blank pie chart
+    """
+
+    # Create empty dataframe
+    empty_df = pd.DataFrame({"Category": ["No Data"], "Value": [1]})
+
+    # Create pie chart from empty df
+    pie_chart = px.pie(
+        empty_df,
+        names="Category",
+        values='Value',
+        title="No Data",
+        color_discrete_sequence=["lightgray"]
+    )
+
+    # Hide labels and percentage values
+    pie_chart.update_traces(textinfo="none", hoverinfo="none")
+
+    # Remove legend and add no data message to pie chart
+    pie_chart.update_layout(
+        showlegend=False,
+        annotations=[dict(
+            text="No Data",
+            x=0.5,
+            y=0.5,
+            showarrow=False
+        )]
+    )
+
     return pie_chart
