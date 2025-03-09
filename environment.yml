@@ -7,7 +7,7 @@ dependencies:
   - ipykernel=6.12.1
   - dash=2.18*
   - dash-bootstrap-components=1.7.*
-  - plotly=5.8.0
+  - plotly=6.0.0
   - tabulate=0.8.9
   - lxml=4.8.0
   - altair=5.5.*
