@@ -25,9 +25,9 @@ app.layout = dbc.Container([
     ]),
     sidebar,
     dbc.Row([
-        dbc.Col(map_chart, md=8),
+        dbc.Col(map_chart, md=8, style={"paddingLeft": "300px"}),  
         dbc.Col([
-            crime_bar_chart,  
+            crime_pie_chart, 
             gender_pie_chart,
             age_pie_chart
         ], md=4)
