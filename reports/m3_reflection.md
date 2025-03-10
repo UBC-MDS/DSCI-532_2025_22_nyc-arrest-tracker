@@ -23,7 +23,22 @@
 - We would like to have the map appear greyed out entirely when the filters result in empty dataframes. Current attempts resulted in it resetting the pie charts to show defaults instead of empty placeholders. Will be fixed next milestone.
 
 ## What the dashboard does well
+- Interactivity and flexibility: The dashboard offers various filters (such as date range and crime type) that allow users to drill down into specific data, providing a tailored view of arrests and crime trends.
+- Visualization clarity: The layout and charts are visually appealing, with clear demarcations for arrest data by region, gender, age, and crime type.
+- User Experience: The widgets and interactive elements are easy to use, with filters, pie charts, and bar charts all working smoothly.
 
 ## Dashboard limitations
+- Excessive White Space: There is too much unused space, particularly around the charts and visual elements. This makes the dashboard feel less compact and less efficient.
+- Reset Button Does Not Function: The reset button is not properly clearing all selected filters and is not unselecting regions on the map.
+- Slider Bar Animation Missing: The transition for the slider bar is not animated, which makes the UI feel static and less interactive.
+- Filters Visibility: The filter panel is not prominent enough on the landing page, and its placement needs to be more noticeable to ensure users can find it easily.
+- Font Overlapping in Filters: The fonts in the filter options are overlapping, which affects readability and the overall user experience.
+
 
 ## Potential future improvements and additions
+- Fix Reset Functionality: Address the issues with the reset button so it properly clears all selections, including unselecting map regions.
+- Map Grey-Out Feature: When the filters result in an empty dataset, the map should grey out to indicate no available data, providing better visual feedback to the user.
+- Improve Overall Layout: Address the white space issue and improve the overall arrangement of the elements to create a more compact and efficient layout.
+- Add Sidebar Transitions: Implement transitions for the sidebar so that it smoothly slides in from the left side of the screen, making the UI feel more dynamic.
+- Move Filters to One Corner: Relocate the filter panel to one corner of the screen to optimize space, and allow the filter panel to slide in and out for better interactivity.
+- Make Sidebar Semi-Transparent: Adding a slight transparency to the sidebar would create a modern and clean look, enhancing the overall aesthetic of the dashboard.
