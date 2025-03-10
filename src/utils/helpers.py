@@ -190,6 +190,7 @@ def create_pie_chart(data, title):
             '%{percent:.2%} of Total<extra></extra>'
         ),
         textinfo='percent',
+        textposition='inside'
     )
 
     # Remove the legend to avoid large labels on the left
@@ -202,7 +203,8 @@ def create_pie_chart(data, title):
             font_size=14,
             font_family="Arial"
         ),
-
+        uniformtext_minsize=12,
+        uniformtext_mode='hide',
         height=190,  
         margin=dict(l=10, r=10, t=30, b=10),  
         title=dict(
@@ -241,12 +243,20 @@ def create_empty_pie_chart():
     # Remove legend and add no data message to pie chart
     pie_chart.update_layout(
         showlegend=False,
+        height=190,
+        margin=dict(l=10, r=10, t=30, b=10),
         annotations=[dict(
             text="No Data",
             x=0.5,
             y=0.5,
             showarrow=False
-        )]
+        )],
+        title=dict(
+            text="No Data",
+            font=dict(size=14),
+            x=0.5,
+            y=0.95
+        )
     )
 
     return pie_chart
@@ -317,20 +327,17 @@ def create_bar_chart(data, title):
             gridwidth=0.5
         )
     )
-    
-    # Add value labels at the end of each bar
-    bar_chart.update_traces(
-        texttemplate='%{x:,}',
-        textposition='outside',
-        textfont=dict(size=11)
-    )
-    
+
     return bar_chart
 
 
 def create_empty_bar_chart():
     """Create an empty bar chart with a message."""
-    fig = px.bar(x=[], y=[])
+
+    # Create empty dataframe
+    empty_df = pd.DataFrame({"Category": [], "Value": []})
+    fig = px.bar(empty_df, x='Value', y='Category')
+
     fig.update_layout(
         title="No Data Available",
         annotations=[
