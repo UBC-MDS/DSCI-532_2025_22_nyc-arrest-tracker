@@ -166,7 +166,7 @@ github_link = html.A(
 
 # Last updated date
 last_update_date = html.P(
-    "Last updated on March 1st, 2025",
+    "Last updated on March 9th, 2025",
     style={
         "font-size": "12px",
         'width': '50%',
