@@ -18,16 +18,16 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
 # Layout
-app.layout = dbc.Container([
+app.layout =  dbc.Container([
     dbc.Row([
         dbc.Col(title_comp),
         collapse_button
     ]),
     sidebar,
     dbc.Row([
-        dbc.Col(map_chart, md=8),
+        dbc.Col(map_chart, md=8, style={"paddingLeft": "300px"}),  
         dbc.Col([
-            crime_bar_chart,  
+            crime_bar_chart, 
             gender_pie_chart,
             age_pie_chart
         ], md=4)
