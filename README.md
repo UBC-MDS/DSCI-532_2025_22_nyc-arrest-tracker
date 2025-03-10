@@ -25,6 +25,7 @@ This dashboard helps government leaders assess the effectiveness of their polici
 - Examine Demographics: Use pie charts to explore arrests by gender and age group.
 - Filter Data: Use the sidebar to filter data by crime type, and toggle between precinct and borough views on the map.
 - Customize Map View: Switch between viewing precinct locations and borough locations on the map with the toggle button.
+- Use Date Range Picker: Filter data by specific date ranges using the calendar feature to track trends over time.
 
 
 ### Support
@@ -57,7 +58,7 @@ conda activate group22-env
 4. Run the app locally
 
 ```bash
-python src/app.py
+python -m src.app
 ```
 
 ### Dependencies:
