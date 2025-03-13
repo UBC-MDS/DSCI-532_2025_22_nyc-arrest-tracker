@@ -1,14 +1,14 @@
 from dash import Output, Input, callback, State, callback_context
 import altair as alt
+import pandas as pd
 
 from src.data import nyc_arrests, nyc_boroughs, nyc_precinct
 from src.utils import (
+    filter_data,
     filter_data_by_crime_type,
     filter_data_by_date_range,
 )
 
-
-# Create map chart function
 @callback(
     Output('map', 'spec'),
     [Input('map-toggle', 'value'),
@@ -29,48 +29,57 @@ def create_map_chart(
     if ctx.triggered:
         trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
-        # Only apply crime type filter if the apply button was clicked
+        # Only apply filter if the apply button was clicked
         if trigger_id == 'apply-button':
-            filtered_arrests = filter_data_by_date_range(
-                nyc_arrests, start_date, end_date
+            filtered_arrests = filter_data(
+                nyc_arrests,
+                start_date=start_date,
+                end_date=end_date,
+                crime_types=crime_types if crime_types else None
             )
-            if crime_types:
-                filtered_arrests = filter_data_by_crime_type(
-                    filtered_arrests, crime_types
-                )
 
         if trigger_id == 'reset-button':
             filtered_arrests = nyc_arrests
 
-    # Recalculate aggregated data
-    arrest_data_grp_borough_filtered = filtered_arrests.groupby(
-        "borough"
-    ).size().reset_index(name='counts')
-
-    arrest_data_grp_precinct_filtered = filtered_arrests.groupby(
-        "ARREST_PRECINCT"
-    ).size().reset_index(name='counts')
-
-    # Update geo data with filtered counts
     if toggle_value:  # Precinct view
+        arrest_data_grp_precinct_filtered = (
+            filtered_arrests
+            .groupby('ARREST_PRECINCT', as_index=False)
+            .agg(counts=('ARREST_PRECINCT', 'size'))
+        )
+        
         geo_df = nyc_precinct.merge(
             arrest_data_grp_precinct_filtered,
             how="left",
             left_on="precinct",
-            right_on="ARREST_PRECINCT"
+            right_on="ARREST_PRECINCT",
+            copy=False
         ).rename(
             columns={"precinct": "Precinct", "counts": "Arrests"}
         )[["Precinct", "Arrests", "geometry"]]
+        
+        # Handle NaN values in one vectorized operation
+        geo_df["Arrests"] = geo_df["Arrests"].fillna(0).astype(int)
         tooltip_label = 'Precinct'
     else:  # Borough view
+        arrest_data_grp_borough_filtered = (
+            filtered_arrests
+            .groupby('borough', as_index=False)
+            .agg(counts=('borough', 'size'))
+        )
+        
         geo_df = nyc_boroughs.merge(
             arrest_data_grp_borough_filtered,
             how="left",
             left_on="name",
-            right_on="borough"
+            right_on="borough",
+            copy=False
         ).rename(
             columns={"borough": "Borough", "counts": "Arrests"}
         )[["Borough", "Arrests", "geometry"]]
+        
+        # Handle NaN values in one vectorized operation
+        geo_df["Arrests"] = geo_df["Arrests"].fillna(0).astype(int)
         tooltip_label = 'Borough'
 
     select_region = alt.selection_point(
@@ -94,10 +103,6 @@ def create_map_chart(
         opacity=alt.condition(select_region, alt.value(0.9), alt.value(0.3))
     ).add_params(
         select_region
-    ).configure_legend(
-        orient="left",
-        padding=10,
-        offset=5
     ).to_dict()
 
     return map_chart
