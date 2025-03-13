@@ -124,6 +124,22 @@ sidebar = dbc.Collapse(
     is_open=False,  # Start collapsed
 )
 
+footer_toggle_button = dbc.Button(
+    "About ▼",
+    id="footer-toggle-button",
+    color="light",
+    size="sm",
+    className="my-2",
+    style={
+        'margin': '10px auto',
+        'display': 'block',
+        'width': '120px',
+        'background-color': 'steelblue',  
+        'color': 'white',                 
+        'border': 'none',  
+    }
+)
+
 # Footer description
 footer_desc = html.P(
     '''
@@ -145,8 +161,6 @@ footer_creators = html.P(
     "Creators: Michael Gelfand, Michael Hewlett, Hala Arar",
     style={
         "font-size": "12px",
-        'width': '50%',
-        'margin-left': '0px',
         'color': 'black'
     }
 )
@@ -158,8 +172,6 @@ github_link = html.A(
     target="_blank",
     style={
         "font-size": "12px",
-        'width': '50%',
-        'margin-left': '0px',
         'color': '#00BFFF'
     }
 )
@@ -169,22 +181,29 @@ last_update_date = html.P(
     "Last updated on March 9th, 2025",
     style={
         "font-size": "12px",
-        'width': '50%',
-        'margin-left': '0px',
         'color': 'black'
-        }
+    }
 )
 
-# Footer information
-footer_info = dbc.Col(
-    html.Div([
-        footer_desc,
-        footer_creators,
-        github_link,
-        last_update_date
-    ]),
-    width=12
+footer_content = dbc.Collapse(
+    dbc.Card(
+        dbc.CardBody([
+            footer_desc,
+            footer_creators,
+            github_link,
+            last_update_date
+        ]),
+        className="mt-2",
+        style={'border-radius': '5px'}
+    ),
+    id="footer-collapse",
+    is_open=False
 )
+
+footer_component = html.Div([
+    footer_toggle_button,
+    footer_content
+], className="mt-3 mb-4")
 
 # Title
 title_comp = html.H1(

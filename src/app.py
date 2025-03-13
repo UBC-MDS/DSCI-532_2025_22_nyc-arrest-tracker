@@ -6,7 +6,7 @@ from .components import (
     age_pie_chart,
     collapse_button,
     crime_bar_chart,
-    footer_info,
+    footer_component,
     gender_pie_chart,
     map_chart,
     sidebar,
@@ -32,7 +32,7 @@ app.layout = dbc.Container([
             age_pie_chart
         ], md=4)
     ]),
-    dbc.Row(footer_info)
+    dbc.Row(dbc.Col(footer_component, width=12))
 ], fluid=True)
 
 # Run the app/dashboard
