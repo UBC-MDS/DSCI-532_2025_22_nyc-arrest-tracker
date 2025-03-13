@@ -16,6 +16,8 @@ from .components import (
 # Initialization
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
+app.title = "Arrest Tracker"
+
 
 # Layout
 app.layout = dbc.Container([
