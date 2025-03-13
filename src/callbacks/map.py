@@ -94,6 +94,10 @@ def create_map_chart(
         opacity=alt.condition(select_region, alt.value(0.9), alt.value(0.3))
     ).add_params(
         select_region
+    ).configure_legend(
+        orient="left",
+        padding=10,
+        offset=5
     ).to_dict()
 
     return map_chart
