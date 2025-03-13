@@ -12,7 +12,11 @@ crime_type_dropdown = dcc.Dropdown(
     value=[],
     multi=True,
     placeholder="Select crime types (empty for all)",
-    className="mb-3"
+    className="mb-3",    
+    style={
+        "width": "100%"
+    },
+    # optionHeight=55,
 )
 
 # Toggle switch for displaying precincts or boroughs
@@ -112,7 +116,7 @@ sidebar = dbc.Collapse(
             "position": "fixed",
             "top": 0,
             "left": 0,  # Always aligned to the left
-            "width": "300px",
+            "width": "375px",
             "height": "100vh",
             "background-color": "#e6e6e6",
             "padding": "20px",
