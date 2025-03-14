@@ -34,7 +34,6 @@ def update_all_pie_charts(
     triggered_id = None
     if ctx.triggered:
         triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
-        print(triggered_id)
 
     # First get unfiltered data
     filtered_by_crime = nyc_arrests
