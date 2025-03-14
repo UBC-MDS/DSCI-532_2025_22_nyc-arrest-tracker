@@ -10,5 +10,5 @@ map_chart = dbc.Col(
             signalsToObserve=['select_region']
         )]
     ),
-    md=8
+    md=6
 )
