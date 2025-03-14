@@ -102,7 +102,8 @@ def create_map_chart(
         height=450,
         title=map_title
     ).mark_geoshape(
-        stroke='grey'
+        stroke='grey',
+        cursor='pointer'
     ).project(
         'albersUsa'
     ).encode(
