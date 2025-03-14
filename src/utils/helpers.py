@@ -1,11 +1,10 @@
 import plotly.express as px
 import pandas as pd
 
-
-# Helper function to filter data by date range
+# Filter data by date range
 def filter_data_by_date_range(data, start_date, end_date):
     """
-    Filter data by selected date range
+    Filter data by selected date range - vectorized version
 
     Parameters:
     data (pd.DataFrame): DataFrame to filter
@@ -16,17 +15,16 @@ def filter_data_by_date_range(data, start_date, end_date):
     pd.DataFrame: Filtered data
     """
     if start_date and end_date:
-        return data[
-            (data['ARREST_DATE'] >= start_date) &
-            (data['ARREST_DATE'] <= end_date)
-        ]
+        # Single boolean mask operation instead of chained filtering
+        date_mask = (data['ARREST_DATE'] >= start_date) & (data['ARREST_DATE'] <= end_date)
+        return data[date_mask]
     return data
 
 
-# Helper function to filter data by crime types
+# Filter data by crime types
 def filter_data_by_crime_type(data, crime_types):
     """
-    Filter data by selected crime types
+    Filter data by selected crime types - vectorized version
 
     Parameters:
     data (pd.DataFrame): DataFrame to filter
@@ -38,7 +36,47 @@ def filter_data_by_crime_type(data, crime_types):
     if not crime_types:  # Empty list means all crimes
         return data
 
-    return data[data['OFNS_DESC'].isin(crime_types)]
+    crime_mask = data['OFNS_DESC'].isin(crime_types)
+    return data[crime_mask]
+
+def filter_data(data, start_date=None, end_date=None, crime_types=None, selected_location=None):
+    """
+    Combined filter function to apply multiple filters in one pass
+
+    Parameters:
+    data (pd.DataFrame): DataFrame to filter
+    start_date (str): Start date of the range 
+    end_date (str): End date of the range
+    crime_types (list): Crime types to filter by
+    selected_location: The selected borough or precinct
+
+    Returns:
+    pd.DataFrame: Filtered data
+    """
+    # Start with all rows selected
+    mask = pd.Series(True, index=data.index)
+    
+    # Date filter
+    if start_date and end_date:
+        date_mask = (data['ARREST_DATE'] >= start_date) & (data['ARREST_DATE'] <= end_date)
+        mask = mask & date_mask
+    
+    # Crime type filter
+    if crime_types:
+        crime_mask = data['OFNS_DESC'].isin(crime_types)
+        mask = mask & crime_mask
+    
+    # Location filter
+    if selected_location:
+        if selected_location in ['Bronx', 'Staten Island', 'Brooklyn', 'Manhattan', 'Queens']:
+            # Filter by borough
+            location_mask = (data['borough'] == selected_location)
+        else:
+            # Filter by precinct
+            location_mask = (data['ARREST_PRECINCT'] == selected_location)
+        mask = mask & location_mask
+    
+    return data[mask]
 
 
 # Helper function to get the selected location from clicked_region
@@ -89,6 +127,8 @@ def filter_data_by_location(selected_location, data):
     Returns:
     pd.DataFrame: Filtered arrest data or None if no valid data
     """
+    if selected_location is None:
+        return None
 
     borough_mapping = {
         'B': 'Bronx',
@@ -97,21 +137,17 @@ def filter_data_by_location(selected_location, data):
         'M': 'Manhattan',
         'Q': 'Queens'
     }
-    if selected_location is None:
-        return None
 
+    
     if selected_location in borough_mapping.values():
-        # Filter data for the selected borough
         filtered_data = data[data['borough'] == selected_location]
     else:
-        # Filter data for the selected precinct
         filtered_data = data[data['ARREST_PRECINCT'] == selected_location]
 
     if filtered_data.empty:
         return None
 
     return filtered_data
-
 
 def create_pie_chart(data, title):
     """
