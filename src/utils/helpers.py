@@ -340,6 +340,7 @@ def create_bar_chart(data, title):
     
     # Improve layout and styling
     bar_chart.update_layout(
+        dragmode=False,
         showlegend=False,
         height=240,
         margin=dict(l=10, r=10, t=30, b=10),
@@ -353,14 +354,16 @@ def create_bar_chart(data, title):
         yaxis=dict(
             title='',
             automargin=True,
-            tickfont=dict(size=11)  # Smaller text for crime names
+            tickfont=dict(size=11),  # Smaller text for crime names
+            fixedrange=True
         ),
         xaxis=dict(
             title='Number of Arrests',
             tickfont=dict(size=11),
             showgrid=True,
             gridcolor='lightgray',
-            gridwidth=0.5
+            gridwidth=0.5,
+            fixedrange=True
         )
     )
 
