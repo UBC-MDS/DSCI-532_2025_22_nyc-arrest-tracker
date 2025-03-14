@@ -118,7 +118,7 @@ sidebar = dbc.Collapse(
             "left": 0,  # Always aligned to the left
             "width": "375px",
             "height": "100vh",
-            "background-color": "#e6e6e6",
+            "background-color": "rgba(230, 230, 230, 0.85)",
             "padding": "20px",
             "z-index": "1000",  # Keep sidebar above content
             "overflow-y": "auto"  # Allow scrolling if many options
