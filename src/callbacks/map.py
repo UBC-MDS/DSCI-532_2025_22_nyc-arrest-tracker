@@ -116,6 +116,7 @@ def create_map_chart(
         padding=10,
         offset=5,
         titleFont='Open Sans',
+        titleFontWeight='normal',
         titleFontStyle='normal',
         titleColor='rgb(42, 63, 95)',
         labelFont='Open Sans',
