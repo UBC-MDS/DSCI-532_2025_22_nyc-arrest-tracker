@@ -62,6 +62,7 @@ def create_map_chart(
             columns={"precinct": "Precinct", "counts": "Arrests"}
         )[["Precinct", "Arrests", "geometry"]]
         tooltip_label = 'Precinct'
+        map_title = "NYC Precincts"
     else:  # Borough view
         geo_df = nyc_boroughs.merge(
             arrest_data_grp_borough_filtered,
@@ -72,6 +73,7 @@ def create_map_chart(
             columns={"borough": "Borough", "counts": "Arrests"}
         )[["Borough", "Arrests", "geometry"]]
         tooltip_label = 'Borough'
+        map_title = "NYC Boroughs"
 
     select_region = alt.selection_point(
         fields=[tooltip_label],
@@ -79,11 +81,11 @@ def create_map_chart(
         toggle=False
     )
 
-    # Create map
     map_chart = alt.Chart(
         geo_df,
         width=600,
-        height=500
+        height=500,
+        title=map_title
     ).mark_geoshape(
         stroke='grey'
     ).project(
@@ -97,7 +99,18 @@ def create_map_chart(
     ).configure_legend(
         orient="left",
         padding=10,
-        offset=5
+        offset=5,
+        titleFont='Open Sans',
+        titleFontStyle='normal',
+        titleColor='rgb(42, 63, 95)',
+        labelFont='Open Sans',
+        labelColor='rgb(42, 63, 95)'
+    ).configure_title(
+        font='Open Sans',
+        fontSize=14,
+        fontWeight='normal',
+        fontStyle='normal',
+        color='rgb(42, 63, 95)'
     ).to_dict()
 
     return map_chart
