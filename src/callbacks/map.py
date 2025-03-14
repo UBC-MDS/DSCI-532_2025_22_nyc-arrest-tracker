@@ -61,6 +61,8 @@ def create_map_chart(
         # Handle NaN values in one vectorized operation
         geo_df["Arrests"] = geo_df["Arrests"].fillna(0).astype(int)
         tooltip_label = 'Precinct'
+        map_title = "NYC Precincts"
+        
     else:  # Borough view
         arrest_data_grp_borough_filtered = (
             filtered_arrests
@@ -81,6 +83,7 @@ def create_map_chart(
         # Handle NaN values in one vectorized operation
         geo_df["Arrests"] = geo_df["Arrests"].fillna(0).astype(int)
         tooltip_label = 'Borough'
+        map_title = "NYC Boroughs"
 
     select_region = alt.selection_point(
         fields=[tooltip_label],
@@ -92,7 +95,8 @@ def create_map_chart(
     map_chart = alt.Chart(
         geo_df,
         width=600,
-        height=500
+        height=500,
+        title=map_title
     ).mark_geoshape(
         stroke='grey'
     ).project(
@@ -106,7 +110,18 @@ def create_map_chart(
     ).configure_legend(
         orient="left",
         padding=10,
-        offset=5
+        offset=5,
+        titleFont='Open Sans',
+        titleFontStyle='normal',
+        titleColor='rgb(42, 63, 95)',
+        labelFont='Open Sans',
+        labelColor='rgb(42, 63, 95)'
+    ).configure_title(
+        font='Open Sans',
+        fontSize=14,
+        fontWeight='normal',
+        fontStyle='normal',
+        color='rgb(42, 63, 95)'
     ).to_dict()
 
     return map_chart
