@@ -3,3 +3,7 @@
 .vega-embed summary {
     display: none !important;
 }
+/* Ensure bar chart does not show pointer */
+.js-plotly-plot .draglayer .drag.cursor-pointer {
+    cursor: default !important;
+}
