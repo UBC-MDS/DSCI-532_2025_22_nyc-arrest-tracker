@@ -3,11 +3,7 @@ import altair as alt
 import pandas as pd
 
 from src.data import nyc_arrests, nyc_boroughs, nyc_precinct
-from src.utils import (
-    filter_data,
-    filter_data_by_crime_type,
-    filter_data_by_date_range,
-)
+from src.utils import filter_data
 
 @callback(
     Output('map', 'spec'),
@@ -21,6 +17,7 @@ from src.utils import (
 def create_map_chart(
     toggle_value, apply_clicks, reset_clicks, start_date, end_date, crime_types
 ):
+
     # Start with unfiltered data
     filtered_arrests = nyc_arrests
 
@@ -77,7 +74,7 @@ def create_map_chart(
             right_on="borough",
             copy=False
         ).rename(
-            columns={"borough": "Borough", "counts": "Arrests"}
+            columns={"name": "Borough", "counts": "Arrests"}
         )[["Borough", "Arrests", "geometry"]]
         
         # Handle NaN values in one vectorized operation
@@ -89,6 +86,13 @@ def create_map_chart(
         fields=[tooltip_label],
         name='select_region',
         toggle=False
+    )
+
+    # Set opacity based on selection, grey out regions with no data
+    map_opacity = alt.condition(
+        (select_region & (alt.datum.Arrests > 0)),
+        alt.value(0.9),
+        alt.value(0.3) if alt.datum.Arrests > 0 else alt.value(0.1)
     )
 
     # Create map
@@ -104,7 +108,7 @@ def create_map_chart(
     ).encode(
         color=alt.Color('Arrests:Q', scale=alt.Scale(scheme='blues')),
         tooltip=[tooltip_label, alt.Tooltip('Arrests', format=',')],
-        opacity=alt.condition(select_region, alt.value(0.9), alt.value(0.3))
+        opacity=map_opacity
     ).add_params(
         select_region
     ).configure_legend(
@@ -112,6 +116,7 @@ def create_map_chart(
         padding=10,
         offset=5,
         titleFont='Open Sans',
+        titleFontWeight='normal',
         titleFontStyle='normal',
         titleColor='rgb(42, 63, 95)',
         labelFont='Open Sans',

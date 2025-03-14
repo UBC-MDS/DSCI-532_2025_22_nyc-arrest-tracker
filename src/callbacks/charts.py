@@ -47,7 +47,7 @@ def update_all_pie_charts(
         crime_type_display = f" - Selected Crimes ({len(crime_types)})"
 
     # Apply filter ONLY if the apply button was clicked
-    if triggered_id == "apply-button":
+    if triggered_id == "apply-button" or triggered_id == "map":
         # Use vectorized filtering with the combined filter function
         filtered_by_crime = filter_data(
             nyc_arrests, 
