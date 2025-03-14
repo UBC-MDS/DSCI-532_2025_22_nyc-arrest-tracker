@@ -118,7 +118,7 @@ sidebar = dbc.Collapse(
             "left": 0,  # Always aligned to the left
             "width": "375px",
             "height": "100vh",
-            "background-color": "#e6e6e6",
+            "background-color": "rgba(230, 230, 230, 0.85)",
             "padding": "20px",
             "z-index": "1000",  # Keep sidebar above content
             "overflow-y": "auto"  # Allow scrolling if many options
@@ -128,19 +128,23 @@ sidebar = dbc.Collapse(
     is_open=False,  # Start collapsed
 )
 
-footer_toggle_button = dbc.Button(
-    "About ▼",
-    id="footer-toggle-button",
-    color="light",
-    size="sm",
-    className="my-2",
+footer_toggle_button = dbc.Col(
+    dbc.Button(
+        "About ▼",
+        id="footer-toggle-button",
+        color="light",
+        size="sm",
+        style={
+            'width': '120px',
+            'background-color': 'steelblue',
+            'color': 'white',
+            'margin-top': 10
+        }
+    ),
+    width="auto",
     style={
-        'margin': '10px auto',
-        'display': 'block',
-        'width': '120px',
-        'background-color': 'steelblue',  
-        'color': 'white',                 
-        'border': 'none',  
+        "position": "absolute",
+        "right": "20px",
     }
 )
 
@@ -203,11 +207,6 @@ footer_content = dbc.Collapse(
     id="footer-collapse",
     is_open=False
 )
-
-footer_component = html.Div([
-    footer_toggle_button,
-    footer_content
-], className="mt-3 mb-4")
 
 # Title
 title_comp = html.H1(

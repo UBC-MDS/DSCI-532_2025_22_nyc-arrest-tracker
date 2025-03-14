@@ -99,7 +99,7 @@ def create_map_chart(
     map_chart = alt.Chart(
         geo_df,
         width=600,
-        height=500,
+        height=450,
         title=map_title
     ).mark_geoshape(
         stroke='grey'
