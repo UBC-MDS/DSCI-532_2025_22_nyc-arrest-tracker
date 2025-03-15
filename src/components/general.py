@@ -98,34 +98,31 @@ reset_button = dbc.Button(
 )
 
 # Sidebar for displaying filters and customization options
-sidebar = dbc.Collapse(
-    html.Div(
-        [
-            html.H4("Filters", className="mb-3"),
-            map_switch,
-            html.Label("Select Crime Type:"),
-            crime_type_dropdown,
-
-            # Update the DatePickerRange
-            html.Label("Select Date Range:"),
-            date_filter,
-            apply_button,
-            reset_button
-        ],
-        style={
-            "position": "fixed",
-            "top": 0,
-            "left": 0,  # Always aligned to the left
-            "width": "375px",
-            "height": "100vh",
-            "background-color": "rgba(230, 230, 230, 0.85)",
-            "padding": "20px",
-            "z-index": "1000",  # Keep sidebar above content
-            "overflow-y": "auto"  # Allow scrolling if many options
-        }
-    ),
+sidebar = html.Div(
+    [
+        html.H4("Filters", className="mb-3"),
+        map_switch,
+        html.Label("Select Crime Type:"),
+        crime_type_dropdown,
+        html.Label("Select Date Range:"),
+        date_filter,
+        apply_button,
+        reset_button
+    ],
+    style={
+        "position": "fixed",
+        "top": 0,
+        "left": 0,
+        "width": "375px",
+        "height": "100vh",
+        "background-color": "rgba(230, 230, 230, 0.85)",
+        "padding": "20px",
+        "z-index": "1000",
+        "overflow-y": "auto",
+        "box-shadow": "2px 0 10px rgba(0, 0, 0, 0.2)"
+    },
     id="sidebar",
-    is_open=False,  # Start collapsed
+    className="sidebar",
 )
 
 footer_toggle_button = dbc.Col(
