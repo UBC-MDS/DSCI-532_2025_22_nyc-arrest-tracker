@@ -61,6 +61,14 @@ conda activate group22-env
 python -m src.app
 ```
 
+### Prepocess data:
+
+If you ever need to preprocess the data again, you can run the following command:
+
+```bash
+python src/data/preprocess_data.py
+```
+
 ### Dependencies:
 
 - dash: For creating the interactive dashboard.
@@ -71,6 +79,7 @@ python -m src.app
 - altair: For additional charting and visualization options.
 - tabulate, lxml, numpy: Other utilities for data handling and charting.
 - dash-vega-components, gunicorn: For additional functionality and server deployment.
+- pyarrow: For reading parquet files.
 
 ## Contributing 
 
