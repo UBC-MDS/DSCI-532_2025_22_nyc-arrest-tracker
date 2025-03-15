@@ -32,7 +32,6 @@ app.layout = dbc.Container([
         dbc.Col([
             crime_bar_chart,
             html.Br(),
-            html.Br(),
             dbc.Row([
                 dbc.Col(gender_pie_chart, md=6),
                 dbc.Col(age_pie_chart, md=6)
