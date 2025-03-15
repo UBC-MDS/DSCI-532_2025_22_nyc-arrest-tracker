@@ -15,7 +15,7 @@ This dashboard helps government leaders assess the effectiveness of their polici
 
 ### Demo GIF:
 
-![Check out the demo GIF here to see the dashboard in action.](img/demo.gif)
+![Check out the demo GIF here to see the dashboard in action.](img/demo_m4.gif)
 
 
 ### What You Can Do: 
