@@ -2,14 +2,16 @@ from dash import Output, Input, State, callback, callback_context
 import dash
 from src.data import min_date, max_date
 
+
 @callback(
-    Output("sidebar", "is_open"),
+    Output("sidebar", "className"),
     Input("collapse-button", "n_clicks"),
-    State("sidebar", "is_open"),
+    prevent_initial_call=True
 )
-def toggle_sidebar(n, is_open):
+def toggle_sidebar(n_clicks):
     # Toggle sidebar visiblity
-    return not is_open if n else is_open
+    return "sidebar is-open" if n_clicks % 2 != 0 else "sidebar"
+
 
 @callback(
     Output('crime-type-dropdown', 'value'),
