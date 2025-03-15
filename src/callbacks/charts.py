@@ -1,5 +1,4 @@
 from dash import Output, Input, State, callback, callback_context
-import pandas as pd
 
 from src.data import nyc_arrests
 from src.utils import (
@@ -8,9 +7,7 @@ from src.utils import (
     filter_data_by_location,
     create_pie_chart,
     create_bar_chart,
-    filter_data_by_date_range,
-    filter_data_by_crime_type,
-    create_empty_pie_chart, 
+    create_empty_pie_chart,
     create_empty_bar_chart
 )
 
