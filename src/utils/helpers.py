@@ -241,13 +241,13 @@ def create_pie_chart(data, title):
         ),
         uniformtext_minsize=12,
         uniformtext_mode='hide',
-        height=190,  
-        margin=dict(l=10, r=10, t=30, b=10),  
+        height=220,  
+        margin=dict(l=10, r=10, t=50, b=10),  
         title=dict(
             text=title,
             font=dict(size=14),  
             x=0.5, 
-            y=0.95  
+            y=0.90  
         )
     )
     return pie_chart
@@ -274,13 +274,15 @@ def create_empty_pie_chart():
     )
 
     # Hide labels and percentage values
-    pie_chart.update_traces(textinfo="none", hoverinfo="none")
+    pie_chart.update_traces(
+        textinfo="none", hoverinfo="skip", hovertemplate=None
+    )
 
     # Remove legend and add no data message to pie chart
     pie_chart.update_layout(
         showlegend=False,
-        height=190,
-        margin=dict(l=10, r=10, t=30, b=10),
+        height=220,
+        margin=dict(l=10, r=10, t=50, b=10),
         annotations=[dict(
             text="No Data",
             x=0.5,
@@ -291,7 +293,7 @@ def create_empty_pie_chart():
             text="No Data",
             font=dict(size=14),
             x=0.5,
-            y=0.95
+            y=0.90
         )
     )
 
@@ -379,6 +381,7 @@ def create_empty_bar_chart():
 
     fig.update_layout(
         title="No Data Available",
+        dragmode=False,
         annotations=[
             dict(
                 text="No data available for the selected filters",
@@ -389,6 +392,12 @@ def create_empty_bar_chart():
                 y=0.5
             )
         ],
-        height=300
+        yaxis=dict(
+            fixedrange=True
+        ),
+        xaxis=dict(
+            fixedrange=True
+        ),
+        height=240
     )
     return fig
