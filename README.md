@@ -61,6 +61,14 @@ conda activate group22-env
 python -m src.app
 ```
 
+### Prepocess data:
+
+If you ever need to preprocess the data again, you can run the following command:
+
+```bash
+python src/data/preprocess_data.py
+```
+
 ### Dependencies:
 
 - dash: For creating the interactive dashboard.
