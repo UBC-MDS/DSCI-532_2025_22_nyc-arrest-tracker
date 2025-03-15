@@ -1,5 +1,6 @@
 import dash_bootstrap_components as dbc
 from dash import Dash, html
+from flask_caching import Cache
 
 from . import callbacks
 from .components import (
@@ -14,10 +15,21 @@ from .components import (
     title_comp
 )
 
+from .utils.helpers import filter_data_by_date_range
+
 # Initialization
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
+
+cache = Cache(app.server, config={'CACHE_TYPE': 'simple'}) 
+
+
 app.title = "Arrest Tracker"
+
+# Cache the filter_data_by_date_range function
+@cache.memoize(timeout=60*60)  # Cache for 1 hour
+def cached_filter_data_by_date_range(data, start_date, end_date):
+    return filter_data_by_date_range(data, start_date, end_date)
 
 
 # Layout
