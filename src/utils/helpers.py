@@ -274,7 +274,9 @@ def create_empty_pie_chart():
     )
 
     # Hide labels and percentage values
-    pie_chart.update_traces(textinfo="none", hoverinfo="none")
+    pie_chart.update_traces(
+        textinfo="none", hoverinfo="skip", hovertemplate=None
+    )
 
     # Remove legend and add no data message to pie chart
     pie_chart.update_layout(
@@ -379,6 +381,7 @@ def create_empty_bar_chart():
 
     fig.update_layout(
         title="No Data Available",
+        dragmode=False,
         annotations=[
             dict(
                 text="No data available for the selected filters",
@@ -389,6 +392,12 @@ def create_empty_bar_chart():
                 y=0.5
             )
         ],
+        yaxis=dict(
+            fixedrange=True
+        ),
+        xaxis=dict(
+            fixedrange=True
+        ),
         height=240
     )
     return fig
