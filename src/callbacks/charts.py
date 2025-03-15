@@ -38,10 +38,13 @@ def update_all_pie_charts(
     # Format crime types for display
     if not crime_types:
         crime_type_display = ""
+        pie_sep = ""
     elif len(crime_types) == 1:
         crime_type_display = f" - {crime_types[0]}"
+        pie_sep = "<br>"
     else:
         crime_type_display = f" - Selected Crimes ({len(crime_types)})"
+        pie_sep = "<br>"
 
     # Apply filter ONLY if the apply button was clicked
     if triggered_id == "apply-button" or triggered_id == "map":
@@ -119,12 +122,12 @@ def update_all_pie_charts(
     # Create charts with pre-computed data
     updated_gender_chart = create_pie_chart(
         gender_counts,
-        f"Arrests by Gender{location_label_display}{crime_type_display}"
+        f"Arrests by Gender{location_label_display}{pie_sep}{crime_type_display}"
     )
 
     updated_age_chart = create_pie_chart(
         age_counts,
-        f"Arrests by Age Group{location_label_display}{crime_type_display}"
+        f"Arrests by Age Group{location_label_display}{pie_sep}{crime_type_display}"
     )
 
     return updated_crime_chart, updated_gender_chart, updated_age_chart
