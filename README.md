@@ -21,7 +21,7 @@ This dashboard helps government leaders assess the effectiveness of their polici
 ### What You Can Do: 
 
 - View Arrest Locations: The interactive map shows precincts and boroughs in NYC. Hover over locations for tooltips and click on them to get detailed arrest statistics.
-- Analyze Crime Types: View the relative frequency of different crime types in a pie chart.
+- Analyze Crime Types: View the relative frequency of different crime types in a bar chart.
 - Examine Demographics: Use pie charts to explore arrests by gender and age group.
 - Filter Data: Use the sidebar to filter data by crime type, and toggle between precinct and borough views on the map.
 - Customize Map View: Switch between viewing precinct locations and borough locations on the map with the toggle button.
