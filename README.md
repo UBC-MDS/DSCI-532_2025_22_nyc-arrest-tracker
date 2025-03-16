@@ -81,7 +81,7 @@ python src/data/preprocess_data.py
 - dash-vega-components, gunicorn: For additional functionality and server deployment.
 - pyarrow: For reading parquet files.
 - gunicorn: For server deployment.
-flask-caching: For caching functions to improve performance.
+- flask-caching: For caching functions to improve performance.
 
 ## Contributing 
 
